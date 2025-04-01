@@ -1,4 +1,4 @@
-package aceleramaker.project.projeto01_blogpessoal;
+package aceleramaker.project;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
