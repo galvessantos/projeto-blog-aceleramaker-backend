@@ -24,4 +24,10 @@ public class UsuarioController {
         var usuarioId = usuarioService.createUsuario(createUsuarioDto);
         return ResponseEntity.created(URI.create("/v1/usuarios/" + usuarioId.toString())).build();
     }
+
+    @GetMapping("/{usuarioId}")
+    public ResponseEntity<Usuario> getUsuarioById(@PathVariable("usuarioId") String usuarioId) {
+        var usuario = usuarioService.getUsuarioById(usuarioId);
+        return usuario.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
 }

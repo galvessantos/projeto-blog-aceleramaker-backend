@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.Collections;
+import java.util.Optional;
 
 @Service
 public class UsuarioService {
@@ -31,5 +32,9 @@ public class UsuarioService {
         var usuarioSalvo = usuarioRepository.save(entity);
 
         return usuarioSalvo.getId();
+    }
+
+    public Optional<Usuario> getUsuarioById(String usuarioId) {
+        return usuarioRepository.findById(Long.valueOf(usuarioId));
     }
 }
