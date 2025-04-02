@@ -11,7 +11,7 @@ public class Tema {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "descricao", nullable = false, unique = true)
+    @Column(name = "descricao", nullable = false)
     private String descricao;
 
     @OneToMany(mappedBy = "tema", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
