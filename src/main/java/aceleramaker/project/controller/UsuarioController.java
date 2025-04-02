@@ -38,4 +38,10 @@ public class UsuarioController {
 
         return ResponseEntity.ok(usuarios);
     }
+
+    @DeleteMapping("/{usuarioId}")
+    public ResponseEntity<Void> deleteById(@PathVariable("usuarioId") String usuarioId) {
+        usuarioService.deleteById(usuarioId);
+        return ResponseEntity.noContent().build();
+    }
 }

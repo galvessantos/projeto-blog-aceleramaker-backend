@@ -42,4 +42,14 @@ public class UsuarioService {
     public List<Usuario> listUsers() {
         return usuarioRepository.findAll();
     }
+
+    public void deleteById(String usuarioId) {
+        var id = Long.valueOf(usuarioId);
+
+        var usuarioExiste = usuarioRepository.existsById(id);
+
+        if (usuarioExiste) {
+            usuarioRepository.deleteById(id);
+        }
+    }
 }
