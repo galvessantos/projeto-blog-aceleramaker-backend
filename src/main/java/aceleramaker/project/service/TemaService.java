@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class TemaService {
@@ -22,5 +23,12 @@ public class TemaService {
 
     public List<Tema> listarTodos() {
         return temaRepository.findAll();
+    }
+
+    public Optional<Tema> atualizar(Long id, CreateTemaDto dto) {
+        return temaRepository.findById(id).map(tema -> {
+            tema.setDescricao(dto.descricao());
+            return temaRepository.save(tema);
+        });
     }
 }
