@@ -1,5 +1,7 @@
 package aceleramaker.project.controller;
 
+import aceleramaker.project.dto.CreatePostagemDto;
+import aceleramaker.project.dto.UpdatePostagemDto;
 import aceleramaker.project.entity.Postagem;
 import aceleramaker.project.service.PostagemService;
 import org.springframework.http.ResponseEntity;
@@ -17,10 +19,19 @@ public class PostagemController {
         this.postagemService = postagemService;
     }
 
+    @PostMapping
+    public ResponseEntity<Postagem> criar(@RequestBody CreatePostagemDto dto) {
+        return ResponseEntity.ok(postagemService.criar(dto));
+    }
+
     @GetMapping
-    public ResponseEntity<List<Postagem>> listarTodas() {
+    public ResponseEntity<List<Postagem>> listarTodas(@RequestParam(required = false) String titulo) {
+        if (titulo != null && !titulo.isEmpty()) {
+            return ResponseEntity.ok(postagemService.buscarPorTitulo(titulo));
+        }
         return ResponseEntity.ok(postagemService.listarTodas());
     }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<Postagem> buscarPorId(@PathVariable Long id) {
