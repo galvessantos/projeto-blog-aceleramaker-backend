@@ -72,4 +72,11 @@ public class PostagemService {
         postagemRepository.deleteById(id);
     }
 
+    public List<Postagem> buscarPorTema(Long temaId) {
+        return postagemRepository.findByTemaId(temaId);
+    }
+
+    public List<Postagem> buscarPorUsuario(Long usuarioId) {
+        return postagemRepository.findByUsuarioId(usuarioId);
+    }
 }
