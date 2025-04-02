@@ -36,4 +36,7 @@ public class TemaService {
         temaRepository.deleteById(id);
     }
 
+    public Optional<Tema> buscarPorId(Long id) {
+        return temaRepository.findById(id);
+    }
 }
