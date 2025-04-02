@@ -1,6 +1,7 @@
 package aceleramaker.project.service;
 
 import aceleramaker.project.dto.CreatePostagemDto;
+import aceleramaker.project.dto.UpdatePostagemDto;
 import aceleramaker.project.entity.Postagem;
 import aceleramaker.project.entity.Tema;
 import aceleramaker.project.entity.Usuario;
@@ -50,5 +51,20 @@ public class PostagemService {
         postagem.setUsuario(usuario);
 
         return postagemRepository.save(postagem);
+    }
+
+    public Optional<Postagem> atualizar(Long id, UpdatePostagemDto dto) {
+        return postagemRepository.findById(id).map(postagem -> {
+            postagem.setTitulo(dto.titulo());
+            postagem.setTexto(dto.texto());
+
+            if (dto.temaId() != null) {
+                Tema tema = temaRepository.findById(dto.temaId())
+                        .orElseThrow(() -> new RuntimeException("Tema não encontrado"));
+                postagem.setTema(tema);
+            }
+
+            return postagemRepository.save(postagem);
+        });
     }
 }
