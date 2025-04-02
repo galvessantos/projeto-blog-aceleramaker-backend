@@ -32,7 +32,6 @@ public class PostagemController {
         return ResponseEntity.ok(postagemService.listarTodas());
     }
 
-
     @GetMapping("/{id}")
     public ResponseEntity<Postagem> buscarPorId(@PathVariable Long id) {
         return postagemService.buscarPorId(id)
@@ -46,4 +45,11 @@ public class PostagemController {
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletar(@PathVariable Long id) {
+        postagemService.deletar(id);
+        return ResponseEntity.noContent().build();
+    }
+
 }
