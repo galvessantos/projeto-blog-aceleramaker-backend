@@ -2,6 +2,7 @@ package aceleramaker.project.controller;
 
 
 import aceleramaker.project.dto.CreateUsuarioDto;
+import aceleramaker.project.dto.UpdateUsuarioDto;
 import aceleramaker.project.entity.Usuario;
 import aceleramaker.project.service.UsuarioService;
 import org.springframework.http.ResponseEntity;
@@ -37,6 +38,13 @@ public class UsuarioController {
         var usuarios = usuarioService.listUsers();
 
         return ResponseEntity.ok(usuarios);
+    }
+
+    @PutMapping("/{usuarioId}")
+    public ResponseEntity<Void> updateUsuarioById(@PathVariable("usuarioId") String usuarioId,
+                                                  @RequestBody UpdateUsuarioDto updateUsuarioDto) {
+        usuarioService.updateUsuarioById(usuarioId, updateUsuarioDto);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{usuarioId}")

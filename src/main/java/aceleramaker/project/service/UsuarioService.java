@@ -1,6 +1,7 @@
 package aceleramaker.project.service;
 
 import aceleramaker.project.dto.CreateUsuarioDto;
+import aceleramaker.project.dto.UpdateUsuarioDto;
 import aceleramaker.project.entity.Usuario;
 import aceleramaker.project.repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
@@ -41,6 +42,34 @@ public class UsuarioService {
 
     public List<Usuario> listUsers() {
         return usuarioRepository.findAll();
+    }
+
+    public void updateUsuarioById(String usuarioId, UpdateUsuarioDto updateUsuarioDto) {
+        var id = Long.valueOf(usuarioId);
+
+        var usuarioExiste = usuarioRepository.findById(id);
+
+        if(usuarioExiste.isPresent()) {
+            var usuario = usuarioExiste.get();
+
+            if(updateUsuarioDto.usuario() != null) {
+                usuario.setUsuario(updateUsuarioDto.usuario());
+            }
+
+            if(updateUsuarioDto.foto() != null) {
+                usuario.setFoto(updateUsuarioDto.foto());
+            }
+
+            if(updateUsuarioDto.nome() != null) {
+                usuario.setNome(updateUsuarioDto.nome());
+            }
+
+            if(updateUsuarioDto.senha() != null) {
+                usuario.setSenha(updateUsuarioDto.senha());
+            }
+
+            usuarioRepository.save(usuario);
+        }
     }
 
     public void deleteById(String usuarioId) {
