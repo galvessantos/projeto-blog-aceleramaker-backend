@@ -1,5 +1,27 @@
 package aceleramaker.project.controller;
 
+
+import aceleramaker.project.dto.CreateUsuarioDto;
+import aceleramaker.project.entity.Usuario;
+import aceleramaker.project.service.UsuarioService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.net.URI;
+
+@RestController
+@RequestMapping("/v1/usuarios")
 public class UsuarioController {
 
+    private UsuarioService usuarioService;
+
+    public UsuarioController(UsuarioService usuarioService) {
+        this.usuarioService = usuarioService;
+    }
+
+    @PostMapping
+    public ResponseEntity<Usuario> createUser(@RequestBody CreateUsuarioDto createUsuarioDto) {
+        var usuarioId = usuarioService.createUsuario(createUsuarioDto);
+        return ResponseEntity.created(URI.create("/v1/usuarios/" + usuarioId.toString())).build();
+    }
 }
