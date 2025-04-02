@@ -3,9 +3,9 @@ package aceleramaker.project.entity;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.time.LocalDateTime;
-import java.time.Instant;
 
 @Entity
 @Table(name = "tb_postagens")
@@ -21,31 +21,29 @@ public class Postagem {
     @Column(name = "texto", nullable = false, columnDefinition = "TEXT")
     private String texto;
 
-    @Column(name = "data", nullable = false)
-    private LocalDateTime data;
-
     @ManyToOne
     @JoinColumn(name = "tema_id", nullable = false)
+    @JsonIgnoreProperties("postagens")
     private Tema tema;
 
     @ManyToOne
     @JoinColumn(name = "usuario_id", nullable = false)
+    @JsonIgnoreProperties("postagens")
     private Usuario usuario;
 
     @CreationTimestamp
-    private Instant creationTimestamp;
+    private LocalDateTime creationTimestamp;
 
     @UpdateTimestamp
-    private Instant updateTimestamp;
+    private LocalDateTime updateTimestamp;
 
     public Postagem() {
     }
 
-    public Postagem(Long id, String titulo, String texto, LocalDateTime data, Tema tema, Usuario usuario, Instant creationTimestamp, Instant updateTimestamp) {
+    public Postagem(Long id, String titulo, String texto, Tema tema, Usuario usuario, LocalDateTime creationTimestamp, LocalDateTime updateTimestamp) {
         this.id = id;
         this.titulo = titulo;
         this.texto = texto;
-        this.data = data;
         this.tema = tema;
         this.usuario = usuario;
         this.creationTimestamp = creationTimestamp;
@@ -76,14 +74,6 @@ public class Postagem {
         this.texto = texto;
     }
 
-    public LocalDateTime getData() {
-        return data;
-    }
-
-    public void setData(LocalDateTime data) {
-        this.data = data;
-    }
-
     public Tema getTema() {
         return tema;
     }
@@ -100,19 +90,19 @@ public class Postagem {
         this.usuario = usuario;
     }
 
-    public Instant getCreationTimestamp() {
+    public LocalDateTime getCreationTimestamp() {
         return creationTimestamp;
     }
 
-    public void setCreationTimestamp(Instant creationTimestamp) {
+    public void setCreationTimestamp(LocalDateTime creationTimestamp) {
         this.creationTimestamp = creationTimestamp;
     }
 
-    public Instant getUpdateTimestamp() {
+    public LocalDateTime getUpdateTimestamp() {
         return updateTimestamp;
     }
 
-    public void setUpdateTimestamp(Instant updateTimestamp) {
+    public void setUpdateTimestamp(LocalDateTime updateTimestamp) {
         this.updateTimestamp = updateTimestamp;
     }
 }
