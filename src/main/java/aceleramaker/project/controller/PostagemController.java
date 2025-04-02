@@ -52,4 +52,13 @@ public class PostagemController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/tema/{temaId}")
+    public ResponseEntity<List<Postagem>> buscarPorTema(@PathVariable Long temaId) {
+        return ResponseEntity.ok(postagemService.buscarPorTema(temaId));
+    }
+
+    @GetMapping("/usuario/{usuarioId}")
+    public ResponseEntity<List<Postagem>> buscarPorUsuario(@PathVariable Long usuarioId) {
+        return ResponseEntity.ok(postagemService.buscarPorUsuario(usuarioId));
+    }
 }
