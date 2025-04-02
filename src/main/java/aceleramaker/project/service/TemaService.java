@@ -6,6 +6,8 @@ import aceleramaker.project.repository.TemaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class TemaService {
 
@@ -16,5 +18,9 @@ public class TemaService {
         Tema tema = new Tema();
         tema.setDescricao(dto.descricao());
         return temaRepository.save(tema);
+    }
+
+    public List<Tema> listarTodos() {
+        return temaRepository.findAll();
     }
 }
