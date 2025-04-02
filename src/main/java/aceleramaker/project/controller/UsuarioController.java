@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/v1/usuarios")
@@ -29,5 +30,12 @@ public class UsuarioController {
     public ResponseEntity<Usuario> getUsuarioById(@PathVariable("usuarioId") String usuarioId) {
         var usuario = usuarioService.getUsuarioById(usuarioId);
         return usuario.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Usuario>> listUsuarios() {
+        var usuarios = usuarioService.listUsers();
+
+        return ResponseEntity.ok(usuarios);
     }
 }

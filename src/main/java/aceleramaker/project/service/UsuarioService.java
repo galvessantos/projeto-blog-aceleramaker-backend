@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -36,5 +37,9 @@ public class UsuarioService {
 
     public Optional<Usuario> getUsuarioById(String usuarioId) {
         return usuarioRepository.findById(Long.valueOf(usuarioId));
+    }
+
+    public List<Usuario> listUsers() {
+        return usuarioRepository.findAll();
     }
 }
