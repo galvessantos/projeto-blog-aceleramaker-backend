@@ -8,4 +8,6 @@ import java.util.List;
 @Repository
 public interface PostagemRepository extends JpaRepository<Postagem, Long> {
     List<Postagem> findByTituloContainingIgnoreCase(String titulo);
+    List<Postagem> findByTemaId(Long temaId);
+    List<Postagem> findByUsuarioId(Long usuarioId);
 }
