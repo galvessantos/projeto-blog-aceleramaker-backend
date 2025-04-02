@@ -31,4 +31,9 @@ public class TemaService {
             return temaRepository.save(tema);
         });
     }
+
+    public void deletar(Long id) {
+        temaRepository.deleteById(id);
+    }
+
 }
