@@ -33,6 +33,9 @@ public class TemaService {
     }
 
     public void deletar(Long id) {
+        if (!temaRepository.existsById(id)) {
+            throw new RuntimeException("Tema não encontrado");
+        }
         temaRepository.deleteById(id);
     }
 
@@ -43,5 +46,5 @@ public class TemaService {
     public List<Tema> buscarPorDescricaoParcial(String descricao) {
         return temaRepository.findByDescricaoContainingIgnoreCase(descricao);
     }
-    
+
 }
