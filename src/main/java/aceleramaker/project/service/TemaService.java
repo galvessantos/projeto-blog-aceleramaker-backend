@@ -39,4 +39,9 @@ public class TemaService {
     public Optional<Tema> buscarPorId(Long id) {
         return temaRepository.findById(id);
     }
+
+    public List<Tema> buscarPorDescricaoParcial(String descricao) {
+        return temaRepository.findByDescricaoContainingIgnoreCase(descricao);
+    }
+    
 }
