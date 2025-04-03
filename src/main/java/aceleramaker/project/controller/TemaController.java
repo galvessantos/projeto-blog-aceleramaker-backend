@@ -31,4 +31,27 @@ public class TemaController {
         return ResponseEntity.ok(temaService.listarTodos());
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<Tema> buscarPorId(@PathVariable Long id) {
+        return temaService.buscarPorId(id)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Tema> atualizar(@PathVariable Long id, @RequestBody CreateTemaDto dto) {
+        return temaService.atualizar(id, dto)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletar(@PathVariable Long id) {
+        try {
+            temaService.deletar(id);
+            return ResponseEntity.noContent().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }
