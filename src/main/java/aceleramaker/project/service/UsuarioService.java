@@ -4,7 +4,9 @@ import aceleramaker.project.dto.CreateUsuarioDto;
 import aceleramaker.project.dto.UpdateUsuarioDto;
 import aceleramaker.project.entity.Usuario;
 import aceleramaker.project.repository.UsuarioRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -14,14 +16,13 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class UsuarioService {
+public class UsuarioService implements UserDetailsService {
 
-    @Autowired
-    private BCryptPasswordEncoder encoder;
+    private final BCryptPasswordEncoder encoder;
+    private final UsuarioRepository usuarioRepository;
 
-    private UsuarioRepository usuarioRepository;
-
-    public UsuarioService(UsuarioRepository usuarioRepository) {
+    public UsuarioService(BCryptPasswordEncoder encoder, UsuarioRepository usuarioRepository) {
+        this.encoder = encoder;
         this.usuarioRepository = usuarioRepository;
     }
 
@@ -59,7 +60,7 @@ public class UsuarioService {
             var usuario = usuarioExiste.get();
 
             if (updateUsuarioDto.usuario() != null) {
-                usuario.setUsuario(updateUsuarioDto.usuario());
+                usuario.setUsername(updateUsuarioDto.usuario());
             }
 
             if (updateUsuarioDto.foto() != null) {
@@ -86,5 +87,11 @@ public class UsuarioService {
         if (usuarioExiste) {
             usuarioRepository.deleteById(id);
         }
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String usernameOrEmail) throws UsernameNotFoundException {
+        return usuarioRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuário ou Email não encontrado: " + usernameOrEmail));
     }
 }

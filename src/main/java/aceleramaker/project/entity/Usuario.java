@@ -4,12 +4,17 @@ import aceleramaker.project.enums.Role;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import java.time.Instant;
+import java.util.Collection;
 import java.util.List;
 
 @Entity
 @Table(name = "tb_users")
-public class Usuario {
+public class Usuario implements UserDetails{
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -22,8 +27,8 @@ public class Usuario {
     @Column(name = "nome", nullable = false)
     private String nome;
 
-    @Column(name = "usuario", nullable = false, unique = true)
-    private String usuario;
+    @Column(name = "username", nullable = false, unique = true)
+    private String username;
 
     @Column(name = "email", nullable = false, unique = true)
     private String email;
@@ -46,10 +51,10 @@ public class Usuario {
     public Usuario() {
     }
 
-    public Usuario(Long id, String nome, String usuario, String email, String senha, String foto, List<Postagem> postagens, Instant creationTimestamp, Instant updateTimestamp) {
+    public Usuario(Long id, String nome, String username, String email, String senha, String foto, List<Postagem> postagens, Instant creationTimestamp, Instant updateTimestamp) {
         this.id = id;
         this.nome = nome;
-        this.usuario = usuario;
+        this.username = username;
         this.email = email;
         this.senha = senha;
         this.foto = foto;
@@ -58,10 +63,10 @@ public class Usuario {
         this.updateTimestamp = updateTimestamp;
     }
 
-    public Usuario(Long id, String nome, String usuario, String email, String senha, String foto, List<Postagem> postagens, Instant creationTimestamp, Instant updateTimestamp, Role role) {
+    public Usuario(Long id, String nome, String username, String email, String senha, String foto, List<Postagem> postagens, Instant creationTimestamp, Instant updateTimestamp, Role role) {
         this.id = id;
         this.nome = nome;
-        this.usuario = usuario;
+        this.username = username;
         this.email = email;
         this.senha = senha;
         this.foto = foto;
@@ -95,12 +100,42 @@ public class Usuario {
         this.nome = nome;
     }
 
-    public String getUsuario() {
-        return usuario;
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
     }
 
-    public void setUsuario(String usuario) {
-        this.usuario = usuario;
+    @Override
+    public String getPassword() {
+        return senha;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getEmail() {
