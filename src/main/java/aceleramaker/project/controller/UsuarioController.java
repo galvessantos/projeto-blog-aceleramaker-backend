@@ -52,4 +52,9 @@ public class UsuarioController {
         usuarioService.deleteById(usuarioId);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/protected")
+    public ResponseEntity<String> getProtectedEndpoint() {
+        return ResponseEntity.ok("Você acessou um endpoint protegido!");
+    }
 }
