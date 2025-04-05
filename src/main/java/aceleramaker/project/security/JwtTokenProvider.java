@@ -1,8 +1,6 @@
 package aceleramaker.project.security;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -44,8 +42,14 @@ public class JwtTokenProvider {
         try {
             Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(authToken);
             return true;
+        } catch (ExpiredJwtException ex) {
+            System.out.println("Token expirado.");
+        } catch (MalformedJwtException ex) {
+            System.out.println("Token inválido.");
+        } catch (SignatureException ex) {
+            System.out.println("Assinatura do token inválida.");
         } catch (Exception ex) {
-
+            System.out.println("Erro na validação do token.");
         }
         return false;
     }
