@@ -1,15 +1,19 @@
 package aceleramaker.project.entity;
 
+import aceleramaker.project.enums.Role;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-
 import java.time.Instant;
 import java.util.List;
 
 @Entity
 @Table(name = "tb_users")
 public class Usuario {
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role = Role.USER;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -52,6 +56,27 @@ public class Usuario {
         this.postagens = postagens;
         this.creationTimestamp = creationTimestamp;
         this.updateTimestamp = updateTimestamp;
+    }
+
+    public Usuario(Long id, String nome, String usuario, String email, String senha, String foto, List<Postagem> postagens, Instant creationTimestamp, Instant updateTimestamp, Role role) {
+        this.id = id;
+        this.nome = nome;
+        this.usuario = usuario;
+        this.email = email;
+        this.senha = senha;
+        this.foto = foto;
+        this.postagens = postagens;
+        this.creationTimestamp = creationTimestamp;
+        this.updateTimestamp = updateTimestamp;
+        this.role = role;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
     }
 
     public Long getId() {

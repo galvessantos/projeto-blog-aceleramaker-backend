@@ -30,6 +30,7 @@ public class UsuarioService {
                 createUsuarioDto.nome(),
                 createUsuarioDto.usuario(),
                 createUsuarioDto.email(),
+
                 encoder.encode(createUsuarioDto.senha()),
                 null,
                 Collections.emptyList(),
@@ -54,23 +55,23 @@ public class UsuarioService {
 
         var usuarioExiste = usuarioRepository.findById(id);
 
-        if(usuarioExiste.isPresent()) {
+        if (usuarioExiste.isPresent()) {
             var usuario = usuarioExiste.get();
 
-            if(updateUsuarioDto.usuario() != null) {
+            if (updateUsuarioDto.usuario() != null) {
                 usuario.setUsuario(updateUsuarioDto.usuario());
             }
 
-            if(updateUsuarioDto.foto() != null) {
+            if (updateUsuarioDto.foto() != null) {
                 usuario.setFoto(updateUsuarioDto.foto());
             }
 
-            if(updateUsuarioDto.nome() != null) {
+            if (updateUsuarioDto.nome() != null) {
                 usuario.setNome(updateUsuarioDto.nome());
             }
 
-            if(updateUsuarioDto.senha() != null) {
-                usuario.setSenha(updateUsuarioDto.senha());
+            if (updateUsuarioDto.senha() != null) {
+                usuario.setSenha(encoder.encode(updateUsuarioDto.senha()));
             }
 
             usuarioRepository.save(usuario);
