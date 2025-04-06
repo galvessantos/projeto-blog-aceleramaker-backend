@@ -1,20 +1,18 @@
 package aceleramaker.project.security;
 
 import io.jsonwebtoken.*;
-import org.springframework.beans.factory.annotation.Value;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
+import java.security.Key;
 import java.util.Date;
 
 @Component
 public class JwtTokenProvider {
 
-    @Value("${jwt.secret}")
-    private String jwtSecret;
-
-    @Value("${jwt.expiration}")
-    private Long jwtExpirationInMs;
+    private final Key secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS512);
+    private final long jwtExpirationInMs = 3600000;
 
     public String generateToken(Authentication authentication) {
         String username = authentication.getName();
@@ -25,13 +23,13 @@ public class JwtTokenProvider {
                 .setSubject(username)
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
-                .signWith(SignatureAlgorithm.HS512, jwtSecret)
+                .signWith(secretKey)
                 .compact();
     }
 
     public String getUsernameFromJWT(String token) {
         Claims claims = Jwts.parser()
-                .setSigningKey(jwtSecret)
+                .setSigningKey(secretKey)
                 .parseClaimsJws(token)
                 .getBody();
 
@@ -40,16 +38,12 @@ public class JwtTokenProvider {
 
     public boolean validateToken(String authToken) {
         try {
-            Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(authToken);
+            Jwts.parser().setSigningKey(secretKey).parseClaimsJws(authToken);
             return true;
         } catch (ExpiredJwtException ex) {
-            System.out.println("Token expirado.");
         } catch (MalformedJwtException ex) {
-            System.out.println("Token inválido.");
         } catch (SignatureException ex) {
-            System.out.println("Assinatura do token inválida.");
         } catch (Exception ex) {
-            System.out.println("Erro na validação do token.");
         }
         return false;
     }

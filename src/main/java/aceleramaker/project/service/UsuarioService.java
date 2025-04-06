@@ -3,6 +3,7 @@ package aceleramaker.project.service;
 import aceleramaker.project.dto.CreateUsuarioDto;
 import aceleramaker.project.dto.UpdateUsuarioDto;
 import aceleramaker.project.entity.Usuario;
+import aceleramaker.project.enums.Role;
 import aceleramaker.project.repository.UsuarioRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -26,20 +27,19 @@ public class UsuarioService implements UserDetailsService {
         this.usuarioRepository = usuarioRepository;
     }
 
-    public Long createUsuario (CreateUsuarioDto createUsuarioDto) {
+    public Long createUsuario(CreateUsuarioDto createUsuarioDto) {
         var entity = new Usuario(null,
                 createUsuarioDto.nome(),
-                createUsuarioDto.usuario(),
+                createUsuarioDto.username(),
                 createUsuarioDto.email(),
-
                 encoder.encode(createUsuarioDto.senha()),
                 null,
                 Collections.emptyList(),
                 Instant.now(),
-                null);
+                null,
+                Role.USER);
 
         var usuarioSalvo = usuarioRepository.save(entity);
-
         return usuarioSalvo.getId();
     }
 
@@ -59,8 +59,8 @@ public class UsuarioService implements UserDetailsService {
         if (usuarioExiste.isPresent()) {
             var usuario = usuarioExiste.get();
 
-            if (updateUsuarioDto.usuario() != null) {
-                usuario.setUsername(updateUsuarioDto.usuario());
+            if (updateUsuarioDto.username() != null) {
+                usuario.setUsername(updateUsuarioDto.username());
             }
 
             if (updateUsuarioDto.foto() != null) {
@@ -90,8 +90,8 @@ public class UsuarioService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String usernameOrEmail) throws UsernameNotFoundException {
-        return usuarioRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
-                .orElseThrow(() -> new UsernameNotFoundException("Usuário ou Email não encontrado: " + usernameOrEmail));
+    public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
+        return usuarioRepository.findByUsernameOrEmail(login, login)
+                .orElseThrow(() -> new UsernameNotFoundException("Usuário ou Email não encontrado: " + login));
     }
 }

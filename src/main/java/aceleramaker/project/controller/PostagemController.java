@@ -4,10 +4,10 @@ import aceleramaker.project.dto.CreatePostagemDto;
 import aceleramaker.project.dto.UpdatePostagemDto;
 import aceleramaker.project.entity.Postagem;
 import aceleramaker.project.service.PostagemService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/postagens")
@@ -25,11 +25,11 @@ public class PostagemController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Postagem>> listarTodas(@RequestParam(required = false) String titulo) {
+    public ResponseEntity<Page<Postagem>> listarTodas(@RequestParam(required = false) String titulo, Pageable pageable) {
         if (titulo != null && !titulo.isEmpty()) {
-            return ResponseEntity.ok(postagemService.buscarPorTitulo(titulo));
+            return ResponseEntity.ok(postagemService.buscarPorTitulo(titulo, pageable));
         }
-        return ResponseEntity.ok(postagemService.listarTodas());
+        return ResponseEntity.ok(postagemService.listarTodas(pageable));
     }
 
     @GetMapping("/{id}")
@@ -53,12 +53,12 @@ public class PostagemController {
     }
 
     @GetMapping("/tema/{temaId}")
-    public ResponseEntity<List<Postagem>> buscarPorTema(@PathVariable Long temaId) {
-        return ResponseEntity.ok(postagemService.buscarPorTema(temaId));
+    public ResponseEntity<Page<Postagem>> buscarPorTema(@PathVariable Long temaId, Pageable pageable) {
+        return ResponseEntity.ok(postagemService.buscarPorTema(temaId, pageable));
     }
 
     @GetMapping("/usuario/{usuarioId}")
-    public ResponseEntity<List<Postagem>> buscarPorUsuario(@PathVariable Long usuarioId) {
-        return ResponseEntity.ok(postagemService.buscarPorUsuario(usuarioId));
+    public ResponseEntity<Page<Postagem>> buscarPorUsuario(@PathVariable Long usuarioId, Pageable pageable) {
+        return ResponseEntity.ok(postagemService.buscarPorUsuario(usuarioId, pageable));
     }
 }

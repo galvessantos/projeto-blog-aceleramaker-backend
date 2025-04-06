@@ -9,8 +9,10 @@ import aceleramaker.project.repository.PostagemRepository;
 import aceleramaker.project.repository.TemaRepository;
 import aceleramaker.project.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import java.util.List;
+
 import java.util.Optional;
 
 @Service
@@ -25,16 +27,16 @@ public class PostagemService {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
-    public List<Postagem> listarTodas() {
-        return postagemRepository.findAll();
+    public Page<Postagem> listarTodas(Pageable pageable) {
+        return postagemRepository.findAll(pageable);
     }
 
     public Optional<Postagem> buscarPorId(Long id) {
         return postagemRepository.findById(id);
     }
 
-    public List<Postagem> buscarPorTitulo(String titulo) {
-        return postagemRepository.findByTituloContainingIgnoreCase(titulo);
+    public Page<Postagem> buscarPorTitulo(String titulo, Pageable pageable) {
+        return postagemRepository.findByTituloContainingIgnoreCase(titulo, pageable);
     }
 
     public Postagem criar(CreatePostagemDto dto) {
@@ -72,11 +74,11 @@ public class PostagemService {
         postagemRepository.deleteById(id);
     }
 
-    public List<Postagem> buscarPorTema(Long temaId) {
-        return postagemRepository.findByTemaId(temaId);
+    public Page<Postagem> buscarPorTema(Long temaId, Pageable pageable) {
+        return postagemRepository.findByTemaId(temaId, pageable);
     }
 
-    public List<Postagem> buscarPorUsuario(Long usuarioId) {
-        return postagemRepository.findByUsuarioId(usuarioId);
+    public Page<Postagem> buscarPorUsuario(Long usuarioId, Pageable pageable) {
+        return postagemRepository.findByUsuarioId(usuarioId, pageable);
     }
 }
