@@ -3,6 +3,7 @@ package aceleramaker.project.controller;
 import aceleramaker.project.dto.CreateTemaDto;
 import aceleramaker.project.entity.Tema;
 import aceleramaker.project.service.TemaService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,38 +21,35 @@ public class TemaController {
 
     @PostMapping
     public ResponseEntity<Tema> criar(@RequestBody CreateTemaDto dto) {
-        return ResponseEntity.ok(temaService.criar(dto));
+        Tema novoTema = temaService.criar(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(novoTema);
     }
 
     @GetMapping
     public ResponseEntity<List<Tema>> listarTodos(@RequestParam(required = false) String descricao) {
-        if (descricao != null && !descricao.isEmpty()) {
-            return ResponseEntity.ok(temaService.buscarPorDescricaoParcial(descricao));
-        }
-        return ResponseEntity.ok(temaService.listarTodos());
+        List<Tema> temas = (descricao != null && !descricao.isEmpty())
+                ? temaService.buscarPorDescricaoParcial(descricao)
+                : temaService.listarTodos();
+        return ResponseEntity.ok(temas);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Tema> buscarPorId(@PathVariable Long id) {
-        return temaService.buscarPorId(id)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+        Tema tema = temaService.buscarPorId(id)
+                .orElseThrow(() -> new aceleramaker.project.exceptions.ResourceNotFoundException("Tema não encontrado"));
+        return ResponseEntity.ok(tema);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Tema> atualizar(@PathVariable Long id, @RequestBody CreateTemaDto dto) {
-        return temaService.atualizar(id, dto)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+        Tema temaAtualizado = temaService.atualizar(id, dto)
+                .orElseThrow(() -> new aceleramaker.project.exceptions.ResourceNotFoundException("Tema não encontrado"));
+        return ResponseEntity.ok(temaAtualizado);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
-        try {
-            temaService.deletar(id);
-            return ResponseEntity.noContent().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+        temaService.deletar(id); 
+        return ResponseEntity.noContent().build();
     }
 }
