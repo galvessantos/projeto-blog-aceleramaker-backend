@@ -5,6 +5,7 @@ import aceleramaker.project.dto.UpdatePostagemDto;
 import aceleramaker.project.entity.Postagem;
 import aceleramaker.project.entity.Tema;
 import aceleramaker.project.entity.Usuario;
+import aceleramaker.project.exceptions.ResourceNotFoundException;
 import aceleramaker.project.repository.PostagemRepository;
 import aceleramaker.project.repository.TemaRepository;
 import aceleramaker.project.repository.UsuarioRepository;
@@ -45,11 +46,11 @@ public class PostagemService {
         postagem.setTexto(dto.texto());
 
         Tema tema = temaRepository.findById(dto.temaId())
-                .orElseThrow(() -> new RuntimeException("Tema não encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Tema não encontrado com ID: " + dto.temaId()));
         postagem.setTema(tema);
 
         Usuario usuario = usuarioRepository.findById(dto.usuarioId())
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado com ID: " + dto.usuarioId()));
         postagem.setUsuario(usuario);
 
         return postagemRepository.save(postagem);
@@ -62,7 +63,7 @@ public class PostagemService {
 
             if (dto.temaId() != null) {
                 Tema tema = temaRepository.findById(dto.temaId())
-                        .orElseThrow(() -> new RuntimeException("Tema não encontrado"));
+                        .orElseThrow(() -> new ResourceNotFoundException("Tema não encontrado com ID: " + dto.temaId()));
                 postagem.setTema(tema);
             }
 
@@ -71,6 +72,9 @@ public class PostagemService {
     }
 
     public void deletar(Long id) {
+        if (!postagemRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Postagem não encontrada com ID: " + id);
+        }
         postagemRepository.deleteById(id);
     }
 
