@@ -2,6 +2,7 @@ package aceleramaker.project.service;
 
 import aceleramaker.project.dto.CreateTemaDto;
 import aceleramaker.project.entity.Tema;
+import aceleramaker.project.exceptions.ResourceNotFoundException;
 import aceleramaker.project.repository.TemaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,12 +30,14 @@ public class TemaService {
         return temaRepository.findById(id).map(tema -> {
             tema.setDescricao(dto.descricao());
             return temaRepository.save(tema);
+        }).or(() -> {
+            throw new ResourceNotFoundException("Tema não encontrado com ID: " + id);
         });
     }
 
     public void deletar(Long id) {
         if (!temaRepository.existsById(id)) {
-            throw new RuntimeException("Tema não encontrado");
+            throw new ResourceNotFoundException("Tema não encontrado com ID: " + id);
         }
         temaRepository.deleteById(id);
     }
