@@ -19,6 +19,9 @@ public class Tema {
 
     public Tema() {
     }
+    public Tema(String descricao) {
+        this.descricao = descricao;
+    }
 
     public Tema(Long id, String descricao, List<Postagem> postagens) {
         this.id = id;

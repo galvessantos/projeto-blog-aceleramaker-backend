@@ -1,5 +1,6 @@
 package aceleramaker.project.security;
 
+import aceleramaker.project.exceptions.InvalidTokenException;
 import aceleramaker.project.service.MyUserDetailsService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -33,18 +34,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-
         String token = getTokenFromRequest(request);
 
-        if (token != null && jwtTokenProvider.validateToken(token)) {
-            String username = jwtTokenProvider.getUsernameFromJWT(token);
-            var userDetails = userDetailsService.loadUserByUsername(username);
+        if (token != null) {
+            try {
+                if (jwtTokenProvider.validateToken(token)) {
+                    String username = jwtTokenProvider.getUsernameFromJWT(token);
+                    var userDetails = userDetailsService.loadUserByUsername(username);
 
-            var auth = new UsernamePasswordAuthenticationToken(
-                    userDetails, null, userDetails.getAuthorities()
-            );
-            auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-            SecurityContextHolder.getContext().setAuthentication(auth);
+                    var auth = new UsernamePasswordAuthenticationToken(
+                            userDetails, null, userDetails.getAuthorities()
+                    );
+                    auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(auth);
+                } else {
+                    throw new InvalidTokenException("Token inválido ou expirado");
+                }
+            } catch (Exception ex) {
+                throw new InvalidTokenException("Erro na autenticação do token: " + ex.getMessage());
+            }
         }
 
         filterChain.doFilter(request, response);
