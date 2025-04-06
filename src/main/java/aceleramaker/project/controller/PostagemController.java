@@ -50,7 +50,7 @@ public class PostagemController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
-        postagemService.deletar(id); 
+        postagemService.deletar(id);
         return ResponseEntity.noContent().build();
     }
 
