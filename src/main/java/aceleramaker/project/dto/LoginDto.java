@@ -1,4 +1,11 @@
 package aceleramaker.project.dto;
 
-public record LoginDto(String login, String senha) {
-}
+import jakarta.validation.constraints.NotBlank;
+
+public record LoginDto(
+        @NotBlank(message = "O login é obrigatório")
+        String login,
+
+        @NotBlank(message = "A senha é obrigatória")
+        String senha
+) {}

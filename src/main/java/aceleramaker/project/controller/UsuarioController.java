@@ -5,6 +5,7 @@ import aceleramaker.project.dto.UpdateUsuarioDto;
 import aceleramaker.project.entity.Usuario;
 import aceleramaker.project.exceptions.ResourceNotFoundException;
 import aceleramaker.project.service.UsuarioService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,7 +23,7 @@ public class UsuarioController {
     }
 
     @PostMapping
-    public ResponseEntity<Usuario> createUser(@RequestBody CreateUsuarioDto createUsuarioDto) {
+    public ResponseEntity<Usuario> createUser(@RequestBody @Valid CreateUsuarioDto createUsuarioDto) {
         var usuarioId = usuarioService.createUsuario(createUsuarioDto);
         return ResponseEntity.created(URI.create("/v1/usuarios/" + usuarioId)).build();
     }
@@ -42,7 +43,7 @@ public class UsuarioController {
 
     @PutMapping("/{usuarioId}")
     public ResponseEntity<Void> updateUsuarioById(@PathVariable String usuarioId,
-                                                  @RequestBody UpdateUsuarioDto updateUsuarioDto) {
+                                                  @RequestBody @Valid UpdateUsuarioDto updateUsuarioDto) {
         usuarioService.updateUsuarioById(usuarioId, updateUsuarioDto);
         return ResponseEntity.noContent().build();
     }

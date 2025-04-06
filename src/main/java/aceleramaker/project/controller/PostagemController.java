@@ -4,6 +4,7 @@ import aceleramaker.project.dto.CreatePostagemDto;
 import aceleramaker.project.dto.UpdatePostagemDto;
 import aceleramaker.project.entity.Postagem;
 import aceleramaker.project.service.PostagemService;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,7 @@ public class PostagemController {
     }
 
     @PostMapping
-    public ResponseEntity<Postagem> criar(@RequestBody CreatePostagemDto dto) {
+    public ResponseEntity<Postagem> criar(@RequestBody @Valid CreatePostagemDto dto) {
         Postagem novaPostagem = postagemService.criar(dto);
         return ResponseEntity.status(201).body(novaPostagem);
     }
@@ -42,7 +43,7 @@ public class PostagemController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Postagem> atualizar(@PathVariable Long id, @RequestBody UpdatePostagemDto dto) {
+    public ResponseEntity<Postagem> atualizar(@PathVariable Long id, @RequestBody @Valid UpdatePostagemDto dto) {
         Postagem atualizada = postagemService.atualizar(id, dto)
                 .orElseThrow(() -> new aceleramaker.project.exceptions.ResourceNotFoundException("Postagem não encontrada"));
         return ResponseEntity.ok(atualizada);

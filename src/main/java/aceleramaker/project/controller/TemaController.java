@@ -3,6 +3,7 @@ package aceleramaker.project.controller;
 import aceleramaker.project.dto.CreateTemaDto;
 import aceleramaker.project.entity.Tema;
 import aceleramaker.project.service.TemaService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +21,7 @@ public class TemaController {
     }
 
     @PostMapping
-    public ResponseEntity<Tema> criar(@RequestBody CreateTemaDto dto) {
+    public ResponseEntity<Tema> criar(@RequestBody @Valid CreateTemaDto dto) {
         Tema novoTema = temaService.criar(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(novoTema);
     }
@@ -41,7 +42,7 @@ public class TemaController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Tema> atualizar(@PathVariable Long id, @RequestBody CreateTemaDto dto) {
+    public ResponseEntity<Tema> atualizar(@PathVariable Long id, @RequestBody @Valid CreateTemaDto dto) {
         Tema temaAtualizado = temaService.atualizar(id, dto)
                 .orElseThrow(() -> new aceleramaker.project.exceptions.ResourceNotFoundException("Tema não encontrado"));
         return ResponseEntity.ok(temaAtualizado);
