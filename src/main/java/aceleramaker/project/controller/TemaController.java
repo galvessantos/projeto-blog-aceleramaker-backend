@@ -49,7 +49,7 @@ public class TemaController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
-        temaService.deletar(id); 
+        temaService.deletar(id);
         return ResponseEntity.noContent().build();
     }
 }
