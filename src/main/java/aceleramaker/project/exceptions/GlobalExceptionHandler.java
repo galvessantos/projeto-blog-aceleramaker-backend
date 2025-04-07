@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import org.springframework.security.access.AccessDeniedException;
 
+import java.util.Map;
+
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -16,8 +18,9 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(BadRequestException.class)
-    public ResponseEntity<String> handleBadRequest(BadRequestException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    public ResponseEntity<Map<String, String>> handleBadRequestException(BadRequestException ex) {
+        Map<String, String> response = Map.of("message", ex.getMessage());
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(InvalidTokenException.class)

@@ -14,6 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
@@ -43,10 +44,11 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody @Valid CreateUsuarioDto createUsuarioDto) {
+    public ResponseEntity<Map<String, String>> register(@RequestBody @Valid CreateUsuarioDto createUsuarioDto) {
         try {
             var usuarioId = usuarioService.createUsuario(createUsuarioDto);
-            return ResponseEntity.created(URI.create("/v1/usuarios/" + usuarioId)).body("Usuário registrado com sucesso!");
+            Map<String, String> response = Map.of("message", "Usuário registrado com sucesso!");
+            return ResponseEntity.created(URI.create("/v1/usuarios/" + usuarioId)).body(response);
         } catch (Exception e) {
             throw new BadRequestException("Erro ao registrar usuário: " + e.getMessage());
         }

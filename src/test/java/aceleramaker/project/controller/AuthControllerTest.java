@@ -13,6 +13,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 
+import java.util.Map;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -61,10 +63,10 @@ class AuthControllerTest {
 
         when(usuarioService.createUsuario(dto)).thenReturn(1L);
 
-        ResponseEntity<String> response = authController.register(dto);
+        ResponseEntity<Map<String, String>> response = authController.register(dto);
 
         assertEquals(201, response.getStatusCodeValue());
-        assertEquals("Usuário registrado com sucesso!", response.getBody());
+        assertEquals("Usuário registrado com sucesso!", response.getBody().get("message"));
         assertEquals("/v1/usuarios/1", response.getHeaders().getLocation().toString());
     }
 
