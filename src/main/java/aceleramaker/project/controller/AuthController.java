@@ -4,8 +4,14 @@ import aceleramaker.project.dto.LoginDto;
 import aceleramaker.project.dto.LoginRespostaDto;
 import aceleramaker.project.dto.CreateUsuarioDto;
 import aceleramaker.project.exceptions.BadRequestException;
-import aceleramaker.project.service.UsuarioService;
 import aceleramaker.project.security.JwtTokenProvider;
+import aceleramaker.project.service.UsuarioService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -18,6 +24,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
+@Tag(name = "Autenticação", description = "Endpoints de login e registro")
 public class AuthController {
 
     private final AuthenticationManager authenticationManager;
@@ -31,6 +38,16 @@ public class AuthController {
     }
 
     @PostMapping("/login")
+    @Operation(summary = "Realizar login",
+            requestBody = @RequestBody(
+                    required = true,
+                    content = @Content(schema = @Schema(implementation = LoginDto.class))
+            ),
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Login realizado com sucesso"),
+                    @ApiResponse(responseCode = "400", description = "Credenciais inválidas")
+            }
+    )
     public ResponseEntity<LoginRespostaDto> login(@RequestBody @Valid LoginDto loginDto) {
         try {
             Authentication authentication = authenticationManager.authenticate(
@@ -44,6 +61,16 @@ public class AuthController {
     }
 
     @PostMapping("/register")
+    @Operation(summary = "Registrar novo usuário",
+            requestBody = @RequestBody(
+                    required = true,
+                    content = @Content(schema = @Schema(implementation = CreateUsuarioDto.class))
+            ),
+            responses = {
+                    @ApiResponse(responseCode = "201", description = "Usuário registrado com sucesso"),
+                    @ApiResponse(responseCode = "400", description = "Erro ao registrar usuário")
+            }
+    )
     public ResponseEntity<Map<String, String>> register(@RequestBody @Valid CreateUsuarioDto createUsuarioDto) {
         try {
             var usuarioId = usuarioService.createUsuario(createUsuarioDto);
