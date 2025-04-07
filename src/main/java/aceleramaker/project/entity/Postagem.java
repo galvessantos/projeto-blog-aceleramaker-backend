@@ -1,40 +1,49 @@
 package aceleramaker.project.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "tb_postagens")
+@Schema(description = "Entidade que representa uma postagem no blog.")
 public class Postagem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Schema(description = "Identificador único da postagem.", example = "1")
     private Long id;
 
     @Column(name = "titulo", nullable = false)
+    @Schema(description = "Título da postagem.", example = "O melhor projeto do Acelera Maker")
     private String titulo;
 
     @Column(name = "texto", nullable = false, columnDefinition = "TEXT")
+    @Schema(description = "Conteúdo da postagem.", example = "Neste post vamos analisar o código do Gabriel Alves...")
     private String texto;
 
     @ManyToOne
     @JoinColumn(name = "tema_id", nullable = false)
     @JsonIgnoreProperties("postagens")
+    @Schema(description = "Tema associado à postagem.")
     private Tema tema;
 
     @ManyToOne
     @JoinColumn(name = "usuario_id", nullable = false)
     @JsonIgnoreProperties("postagens")
+    @Schema(description = "Usuário autor da postagem.")
     private Usuario usuario;
 
     @CreationTimestamp
+    @Schema(description = "Data e hora de criação da postagem.")
     private LocalDateTime creationTimestamp;
 
     @UpdateTimestamp
+    @Schema(description = "Data e hora da última atualização da postagem.")
     private LocalDateTime updateTimestamp;
 
     public Postagem() {
