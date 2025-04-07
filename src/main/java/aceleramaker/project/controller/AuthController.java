@@ -9,7 +9,6 @@ import aceleramaker.project.service.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -39,16 +38,16 @@ public class AuthController {
 
     @PostMapping("/login")
     @Operation(summary = "Realizar login",
-            requestBody = @RequestBody(
-                    required = true,
-                    content = @Content(schema = @Schema(implementation = LoginDto.class))
-            ),
             responses = {
                     @ApiResponse(responseCode = "200", description = "Login realizado com sucesso"),
                     @ApiResponse(responseCode = "400", description = "Credenciais inválidas")
             }
     )
-    public ResponseEntity<LoginRespostaDto> login(@RequestBody @Valid LoginDto loginDto) {
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            required = true,
+            content = @Content(schema = @Schema(implementation = LoginDto.class))
+    )
+    public ResponseEntity<LoginRespostaDto> login(@org.springframework.web.bind.annotation.RequestBody @Valid LoginDto loginDto) {
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginDto.login(), loginDto.senha())
@@ -62,16 +61,16 @@ public class AuthController {
 
     @PostMapping("/register")
     @Operation(summary = "Registrar novo usuário",
-            requestBody = @RequestBody(
-                    required = true,
-                    content = @Content(schema = @Schema(implementation = CreateUsuarioDto.class))
-            ),
             responses = {
                     @ApiResponse(responseCode = "201", description = "Usuário registrado com sucesso"),
                     @ApiResponse(responseCode = "400", description = "Erro ao registrar usuário")
             }
     )
-    public ResponseEntity<Map<String, String>> register(@RequestBody @Valid CreateUsuarioDto createUsuarioDto) {
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            required = true,
+            content = @Content(schema = @Schema(implementation = CreateUsuarioDto.class))
+    )
+    public ResponseEntity<Map<String, String>> register(@org.springframework.web.bind.annotation.RequestBody @Valid CreateUsuarioDto createUsuarioDto) {
         try {
             var usuarioId = usuarioService.createUsuario(createUsuarioDto);
             Map<String, String> response = Map.of("message", "Usuário registrado com sucesso!");
