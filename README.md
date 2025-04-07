@@ -52,13 +52,47 @@ A documentação da API está disponível via Swagger:
 
 ![Image](https://github.com/user-attachments/assets/9dbb77da-9400-480a-99ba-a34a07d61742)
 
-Principais funcionalidades:
+## 🔐 Autenticação `(/auth)`
+- POST /login – Autenticar e gerar JWT
 
-- Criar, listar, atualizar e deletar usuários
-- Login com geração de token JWT
-- Criar e gerenciar postagens e temas
-- Filtros por tema e título
-- Validações e mensagens amigáveis em erros
+- POST /register – Registrar novo usuário
+
+## 👤 Usuário `(/v1/usuarios)`
+- GET /{id} – Buscar usuário por ID
+
+- GET / – Listar todos os usuários (admin)
+
+- PUT /{id} – Atualizar usuário (somente o próprio)
+
+- DELETE /{id} – Deletar usuário (somente o próprio)
+
+ ## 📝 Postagem `(/api/postagens)`
+- GET / – Listar todas as postagens
+
+- GET /usuario/{id} – Filtrar por autor
+
+- GET /tema/{id} – Filtrar por tema
+
+- GET /?titulo={titulo} – Filtrar por título parcial
+
+- POST / – Criar nova postagem
+
+- PUT /{id} – Atualizar postagem
+
+- DELETE /{id} – Excluir postagem
+
+## ✏️ Tema `(/api/temas)`
+- GET / – Listar todos os temas
+
+- GET /?descricao={descricao} – Buscar por descrição parcial
+
+- GET /{id} – Buscar tema por ID
+
+- POST / – Criar novo tema
+
+- PUT /{id} – Atualizar tema
+
+- DELETE /{id} – Deletar tema
 
 ---
 
