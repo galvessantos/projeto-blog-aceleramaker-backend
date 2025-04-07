@@ -3,7 +3,6 @@ package aceleramaker.project.controller;
 import aceleramaker.project.dto.CreateTemaDto;
 import aceleramaker.project.dto.TemaRespostaDto;
 import aceleramaker.project.entity.Tema;
-import aceleramaker.project.exceptions.ResourceNotFoundException;
 import aceleramaker.project.service.TemaService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

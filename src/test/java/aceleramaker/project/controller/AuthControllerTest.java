@@ -44,7 +44,7 @@ class AuthControllerTest {
         ResponseEntity<LoginRespostaDto> response = authController.login(loginDto);
 
         assertEquals("token123", response.getBody().token());
-        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(200, response.getStatusCode().value());
     }
 
     @Test
@@ -65,7 +65,7 @@ class AuthControllerTest {
 
         ResponseEntity<Map<String, String>> response = authController.register(dto);
 
-        assertEquals(201, response.getStatusCodeValue());
+        assertEquals(201, response.getStatusCode().value());
         assertEquals("Usuário registrado com sucesso!", response.getBody().get("message"));
         assertEquals("/v1/usuarios/1", response.getHeaders().getLocation().toString());
     }

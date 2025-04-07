@@ -17,8 +17,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static java.util.stream.Collectors.toList;
-
 @RestController
 @RequestMapping("/temas")
 @Tag(name = "04 - Temas", description = "Operações relacionadas aos temas das postagens")
@@ -55,7 +53,7 @@ public class TemaController {
 
         List<TemaRespostaDto> resposta = temas.stream()
                 .map(t -> new TemaRespostaDto(t.getId(), t.getDescricao()))
-                .collect(toList());
+                .toList();
 
         return ResponseEntity.ok(resposta);
     }

@@ -91,7 +91,7 @@ class UsuarioServiceTest {
 
         assertEquals("novoNome", usuario.getNome());
         assertEquals("novoUsername", usuario.getUsername());
-        assertEquals("senhaNovaCriptografada", usuario.getSenha());
+        assertEquals("senhaNovaCriptografada", usuario.getPassword());
 
         verify(usuarioRepository, times(1)).save(usuario);
     }

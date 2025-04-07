@@ -13,7 +13,6 @@ import aceleramaker.project.exceptions.ResourceNotFoundException;
 import aceleramaker.project.repository.PostagemRepository;
 import aceleramaker.project.repository.TemaRepository;
 import aceleramaker.project.repository.UsuarioRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -23,14 +22,15 @@ import java.util.Optional;
 @Service
 public class PostagemService {
 
-    @Autowired
-    private PostagemRepository postagemRepository;
+    private final PostagemRepository postagemRepository;
+    private final TemaRepository temaRepository;
+    private final UsuarioRepository usuarioRepository;
 
-    @Autowired
-    private TemaRepository temaRepository;
-
-    @Autowired
-    private UsuarioRepository usuarioRepository;
+    public PostagemService(PostagemRepository postagemRepository, TemaRepository temaRepository, UsuarioRepository usuarioRepository) {
+        this.postagemRepository = postagemRepository;
+        this.temaRepository = temaRepository;
+        this.usuarioRepository = usuarioRepository;
+    }
 
     public Page<PostagemRespostaDto> listarTodas(Pageable pageable) {
         return postagemRepository.findAll(pageable).map(this::converterParaDto);

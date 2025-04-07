@@ -5,7 +5,6 @@ import aceleramaker.project.entity.Tema;
 import aceleramaker.project.exceptions.BadRequestException;
 import aceleramaker.project.exceptions.ResourceNotFoundException;
 import aceleramaker.project.repository.TemaRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,8 +13,11 @@ import java.util.Optional;
 @Service
 public class TemaService {
 
-    @Autowired
-    private TemaRepository temaRepository;
+    private final TemaRepository temaRepository;
+
+    public TemaService(TemaRepository temaRepository) {
+        this.temaRepository = temaRepository;
+    }
 
     public Tema criar(CreateTemaDto dto) {
         Tema tema = new Tema();
@@ -54,5 +56,4 @@ public class TemaService {
     public List<Tema> buscarPorDescricaoParcial(String descricao) {
         return temaRepository.findByDescricaoContainingIgnoreCase(descricao);
     }
-
 }

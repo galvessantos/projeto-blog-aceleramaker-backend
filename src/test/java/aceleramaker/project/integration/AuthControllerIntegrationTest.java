@@ -11,11 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.transaction.annotation.Transactional;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -23,7 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-public class AuthControllerIntegrationTest {
+class AuthControllerIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -34,10 +32,8 @@ public class AuthControllerIntegrationTest {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
-    private String token;
-
     @BeforeEach
-    public void setup() throws Exception {
+    void setup() throws Exception {
         usuarioRepository.deleteAll();
 
         CreateUsuarioDto createUsuarioDto = new CreateUsuarioDto("Novo User", "novoUser", "novo@email.com", "senha123");
@@ -47,7 +43,7 @@ public class AuthControllerIntegrationTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.message").value("Usuário registrado com sucesso!"));
 
-        token = realizarLogin("novo@email.com", "senha123");
+        realizarLogin("novo@email.com", "senha123");
     }
 
     private String realizarLogin(String login, String senha) throws Exception {
@@ -63,7 +59,7 @@ public class AuthControllerIntegrationTest {
     }
 
     @Test
-    public void deveRealizarLoginComCredenciaisValidas() throws Exception {
+    void deveRealizarLoginComCredenciaisValidas() throws Exception {
         LoginDto loginDto = new LoginDto("novo@email.com", "senha123");
 
         mockMvc.perform(post("/auth/login")
@@ -74,7 +70,7 @@ public class AuthControllerIntegrationTest {
     }
 
     @Test
-    public void deveFalharLoginComCredenciaisInvalidas() throws Exception {
+    void deveFalharLoginComCredenciaisInvalidas() throws Exception {
         LoginDto loginDto = new LoginDto("novo@email.com", "senhaIncorreta");
 
         mockMvc.perform(post("/auth/login")
@@ -85,7 +81,7 @@ public class AuthControllerIntegrationTest {
     }
 
     @Test
-    public void deveRegistrarNovoUsuarioComSucesso() throws Exception {
+    void deveRegistrarNovoUsuarioComSucesso() throws Exception {
         CreateUsuarioDto createUsuarioDto = new CreateUsuarioDto("Outro User", "outroUser", "outro@email.com", "123456");
 
         mockMvc.perform(post("/auth/register")

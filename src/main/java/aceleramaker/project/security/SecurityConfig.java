@@ -21,6 +21,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableMethodSecurity
 public class SecurityConfig {
 
+    private static final String USUARIOS_PATH = "/v1/usuarios/**";
+
     private final JwtTokenProvider jwtTokenProvider;
     private final MyUserDetailsService userDetailsService;
 
@@ -32,15 +34,14 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // Desabilitei o CSRF porque a autenticação aqui é via token JWT e não tem sessão nem cookie
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**", "/favicon.ico").permitAll()
                         .requestMatchers(HttpMethod.POST, "/v1/usuarios").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/v1/usuarios/**").authenticated()
-                        .requestMatchers(HttpMethod.PUT, "/v1/usuarios/**").authenticated()
-                        .requestMatchers(HttpMethod.DELETE, "/v1/usuarios/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, USUARIOS_PATH).authenticated()
+                        .requestMatchers(HttpMethod.PUT, USUARIOS_PATH).authenticated()
+                        .requestMatchers(HttpMethod.DELETE, USUARIOS_PATH).authenticated()
                         .requestMatchers(HttpMethod.GET, "/v1/usuarios").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )

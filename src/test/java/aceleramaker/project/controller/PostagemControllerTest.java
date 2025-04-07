@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 class PostagemControllerTest {
@@ -81,7 +80,7 @@ class PostagemControllerTest {
 
         ResponseEntity<PostagemRespostaDto> response = postagemController.criar(dto, userDetails);
 
-        assertEquals(201, response.getStatusCodeValue());
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
         PostagemRespostaDto body = response.getBody();
         assertNotNull(body);
         assertEquals("Título", body.titulo());
@@ -108,7 +107,7 @@ class PostagemControllerTest {
 
         ResponseEntity<Page<PostagemRespostaDto>> response = postagemController.listarTodas(null, PageRequest.of(0, 10));
 
-        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals(1, response.getBody().getContent().size());
         assertEquals("Título", response.getBody().getContent().get(0).titulo());
@@ -128,16 +127,16 @@ class PostagemControllerTest {
                 LocalDateTime.now()
         );
         Page<PostagemRespostaDto> page = new PageImpl<>(List.of(dto));
-        when(postagemService.buscarPorTitulo(eq("teste"), any())).thenReturn(page);
+        when(postagemService.buscarPorTitulo("teste", PageRequest.of(0, 10))).thenReturn(page);
 
         ResponseEntity<Page<PostagemRespostaDto>> response = postagemController.listarTodas("teste", PageRequest.of(0, 10));
 
-        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals(1, response.getBody().getContent().size());
         assertEquals("Título", response.getBody().getContent().get(0).titulo());
 
-        verify(postagemService).buscarPorTitulo(eq("teste"), any());
+        verify(postagemService).buscarPorTitulo("teste", PageRequest.of(0, 10));
     }
 
     @Test
@@ -176,7 +175,7 @@ class PostagemControllerTest {
 
         ResponseEntity<PostagemRespostaDto> response = postagemController.buscarPorId(1L);
 
-        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(respostaDto, response.getBody());
         verify(postagemService).buscarPorIdDto(1L);
     }
@@ -214,11 +213,11 @@ class PostagemControllerTest {
                 postagemAtualizada.getUpdateTimestamp()
         );
 
-        when(postagemService.atualizarDto(eq(1L), eq(dto))).thenReturn(Optional.of(respostaDto));
+        when(postagemService.atualizarDto(1L, dto)).thenReturn(Optional.of(respostaDto));
 
         ResponseEntity<PostagemRespostaDto> response = postagemController.atualizar(1L, dto);
 
-        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(respostaDto, response.getBody());
         verify(postagemService).atualizarDto(1L, dto);
     }
@@ -229,7 +228,7 @@ class PostagemControllerTest {
 
         ResponseEntity<Map<String, String>> response = postagemController.deletar(1L);
 
-        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals("Postagem excluída com sucesso.", response.getBody().get("mensagem"));
         verify(postagemService).deletar(1L);
@@ -247,13 +246,13 @@ class PostagemControllerTest {
                 LocalDateTime.now()
         );
         Page<PostagemRespostaDto> page = new PageImpl<>(List.of(dto));
-        when(postagemService.buscarPorTema(eq(1L), any())).thenReturn(page);
+        when(postagemService.buscarPorTema(1L, PageRequest.of(0, 10))).thenReturn(page);
 
         ResponseEntity<Page<PostagemRespostaDto>> response = postagemController.buscarPorTema(1L, PageRequest.of(0, 10));
 
-        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(page, response.getBody());
-        verify(postagemService).buscarPorTema(eq(1L), any());
+        verify(postagemService).buscarPorTema(1L, PageRequest.of(0, 10));
     }
 
     @Test
@@ -268,22 +267,20 @@ class PostagemControllerTest {
                 LocalDateTime.now()
         );
         Page<PostagemRespostaDto> page = new PageImpl<>(List.of(dto));
-        when(postagemService.buscarPorUsuario(eq(1L), any())).thenReturn(page);
+        when(postagemService.buscarPorUsuario(1L, PageRequest.of(0, 10))).thenReturn(page);
 
         ResponseEntity<Page<PostagemRespostaDto>> response = postagemController.buscarPorUsuario(1L, PageRequest.of(0, 10));
 
-        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(page, response.getBody());
-        verify(postagemService).buscarPorUsuario(eq(1L), any());
+        verify(postagemService).buscarPorUsuario(1L, PageRequest.of(0, 10));
     }
 
     @Test
     void testBuscarPorId_NotFound() {
         when(postagemService.buscarPorIdDto(99L)).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> {
-            postagemController.buscarPorId(99L);
-        });
+        assertThrows(ResourceNotFoundException.class, () -> postagemController.buscarPorId(99L));
 
         verify(postagemService).buscarPorIdDto(99L);
     }
@@ -294,9 +291,7 @@ class PostagemControllerTest {
 
         when(postagemService.atualizarDto(99L, dto)).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> {
-            postagemController.atualizar(99L, dto);
-        });
+        assertThrows(ResourceNotFoundException.class, () -> postagemController.atualizar(99L, dto));
 
         verify(postagemService).atualizarDto(99L, dto);
     }

@@ -17,7 +17,7 @@
 	<properties>
 		<java.version>21</java.version>
 		<jjwt.version>0.11.5</jjwt.version>
-		<sonar.token>squ_cc42d8089fb8e1424d3f8c405adbf5f2fbc4008e</sonar.token>
+		<sonar.token>${sonar.token}</sonar.token>
 	</properties>
 	<dependencies>
 		<dependency>

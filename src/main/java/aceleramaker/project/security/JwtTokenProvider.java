@@ -11,13 +11,13 @@ import java.util.Date;
 @Component
 public class JwtTokenProvider {
 
+    private static final long JWT_EXPIRATION_IN_MS = 3600000;
     private final Key secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS512);
-    private final long jwtExpirationInMs = 3600000;
 
     public String generateToken(Authentication authentication) {
         String username = authentication.getName();
         Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
+        Date expiryDate = new Date(now.getTime() + JWT_EXPIRATION_IN_MS);
 
         return Jwts.builder()
                 .setSubject(username)
@@ -28,8 +28,9 @@ public class JwtTokenProvider {
     }
 
     public String getUsernameFromJWT(String token) {
-        Claims claims = Jwts.parser()
+        Claims claims = Jwts.parserBuilder()
                 .setSigningKey(secretKey)
+                .build()
                 .parseClaimsJws(token)
                 .getBody();
 
@@ -38,13 +39,13 @@ public class JwtTokenProvider {
 
     public boolean validateToken(String authToken) {
         try {
-            Jwts.parser().setSigningKey(secretKey).parseClaimsJws(authToken);
+            Jwts.parserBuilder()
+                    .setSigningKey(secretKey)
+                    .build()
+                    .parseClaimsJws(authToken);
             return true;
-        } catch (ExpiredJwtException ex) {
-        } catch (MalformedJwtException ex) {
-        } catch (SignatureException ex) {
-        } catch (Exception ex) {
+        } catch (JwtException | IllegalArgumentException ex) {
+            return false;
         }
-        return false;
     }
 }

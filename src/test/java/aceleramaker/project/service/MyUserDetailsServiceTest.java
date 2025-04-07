@@ -2,11 +2,9 @@ package aceleramaker.project.service;
 
 import aceleramaker.project.entity.Usuario;
 import aceleramaker.project.enums.Role;
-import aceleramaker.project.exceptions.ResourceNotFoundException;
 import aceleramaker.project.repository.UsuarioRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 

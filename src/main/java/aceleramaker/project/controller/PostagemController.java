@@ -3,7 +3,6 @@ package aceleramaker.project.controller;
 import aceleramaker.project.dto.CreatePostagemDto;
 import aceleramaker.project.dto.PostagemRespostaDto;
 import aceleramaker.project.dto.UpdatePostagemDto;
-import aceleramaker.project.entity.Postagem;
 import aceleramaker.project.exceptions.ResourceNotFoundException;
 import aceleramaker.project.service.PostagemService;
 import io.swagger.v3.oas.annotations.Operation;

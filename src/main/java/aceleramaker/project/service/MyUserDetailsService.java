@@ -1,6 +1,5 @@
 package aceleramaker.project.service;
 
-import aceleramaker.project.exceptions.ResourceNotFoundException;
 import aceleramaker.project.repository.UsuarioRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

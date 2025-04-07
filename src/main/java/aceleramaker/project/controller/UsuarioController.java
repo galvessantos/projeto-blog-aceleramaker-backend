@@ -25,6 +25,8 @@ import java.util.List;
 @Tag(name = "02 - Usuários", description = "Operações relacionadas à conta do usuário")
 public class UsuarioController {
 
+    private static final String USUARIO_NAO_ENCONTRADO = "Usuário não encontrado com ID: ";
+
     private final UsuarioService usuarioService;
 
     public UsuarioController(UsuarioService usuarioService) {
@@ -40,7 +42,7 @@ public class UsuarioController {
     )
     public ResponseEntity<UsuarioRespostaDto> getUsuarioById(@PathVariable Long usuarioId) {
         Usuario usuario = usuarioService.getUsuarioById(usuarioId)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado com ID: " + usuarioId));
+                .orElseThrow(() -> new ResourceNotFoundException(USUARIO_NAO_ENCONTRADO + usuarioId));
 
         UsuarioRespostaDto resposta = new UsuarioRespostaDto(
                 usuario.getNome(),
@@ -87,7 +89,7 @@ public class UsuarioController {
             @Parameter(hidden = true) @AuthenticationPrincipal UserDetails current) {
 
         Usuario alvo = usuarioService.getUsuarioById(usuarioId)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado com ID: " + usuarioId));
+                .orElseThrow(() -> new ResourceNotFoundException(USUARIO_NAO_ENCONTRADO + usuarioId));
 
         if (!current.getUsername().equals(alvo.getUsername())) {
             throw new AccessDeniedCustomException("Você só pode atualizar sua própria conta.");
@@ -110,7 +112,7 @@ public class UsuarioController {
             @Parameter(hidden = true) @AuthenticationPrincipal UserDetails current) {
 
         Usuario alvo = usuarioService.getUsuarioById(usuarioId)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado com ID: " + usuarioId));
+                .orElseThrow(() -> new ResourceNotFoundException(USUARIO_NAO_ENCONTRADO + usuarioId));
 
         if (!current.getUsername().equals(alvo.getUsername())) {
             throw new AccessDeniedException("Você só pode excluir sua própria conta.");

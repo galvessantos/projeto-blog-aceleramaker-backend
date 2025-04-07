@@ -1,7 +1,5 @@
 package aceleramaker.project.integration;
 
-import aceleramaker.project.dto.CreateUsuarioDto;
-import aceleramaker.project.dto.UpdateUsuarioDto;
 import aceleramaker.project.entity.Usuario;
 import aceleramaker.project.enums.Role;
 import aceleramaker.project.repository.UsuarioRepository;
@@ -14,11 +12,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.transaction.annotation.Transactional;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -28,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-public class UsuarioControllerIntegrationTest {
+class UsuarioControllerIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;

@@ -6,12 +6,13 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "tb_postagens")
 @Schema(description = "Entidade que representa uma postagem no blog.")
-public class Postagem {
+public class Postagem implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -57,9 +58,6 @@ public class Postagem {
         this.usuario = usuario;
         this.creationTimestamp = creationTimestamp;
         this.updateTimestamp = updateTimestamp;
-    }
-
-    public Postagem(String s, String s1, Tema tema, Usuario usuario) {
     }
 
     public Long getId() {

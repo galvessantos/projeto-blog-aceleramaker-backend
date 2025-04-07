@@ -3,12 +3,13 @@ package aceleramaker.project.entity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 
+import java.io.Serializable;
 import java.util.List;
 
 @Entity
 @Table(name = "tb_temas")
 @Schema(description = "Entidade que representa um tema de postagens no blog.")
-public class Tema {
+public class Tema implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
