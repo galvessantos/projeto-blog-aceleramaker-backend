@@ -4,6 +4,7 @@ import aceleramaker.project.exceptions.ResourceNotFoundException;
 import aceleramaker.project.repository.UsuarioRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -16,8 +17,9 @@ public class MyUserDetailsService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String login) {
+    public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
         return usuarioRepository.findByUsernameOrEmail(login, login)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuário com login '" + login + "' não encontrado"));
+                .orElseThrow(() -> new UsernameNotFoundException("Usuário com login '" + login + "' não encontrado"));
     }
+
 }

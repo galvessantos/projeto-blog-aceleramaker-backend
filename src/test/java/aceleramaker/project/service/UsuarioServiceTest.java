@@ -10,7 +10,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.time.Instant;
@@ -37,9 +39,12 @@ class UsuarioServiceTest {
     void setup() {
         usuario = new Usuario(
                 1L, "João", "joaozinho", "joao@email.com",
-                "senhaCriptografada", "foto.png",
+                "senhaCriptografada", null,
                 new ArrayList<>(), Instant.now(), null, Role.USER
         );
+
+        var auth = new UsernamePasswordAuthenticationToken("joaozinho", null, new ArrayList<>());
+        SecurityContextHolder.getContext().setAuthentication(auth);
     }
 
     @Test
@@ -59,7 +64,7 @@ class UsuarioServiceTest {
     void deveRetornarUsuarioPorId() {
         when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
 
-        Optional<Usuario> resultado = usuarioService.getUsuarioById("1");
+        Optional<Usuario> resultado = usuarioService.getUsuarioById(1L);
 
         assertTrue(resultado.isPresent());
         assertEquals("João", resultado.get().getNome());
@@ -77,15 +82,14 @@ class UsuarioServiceTest {
 
     @Test
     void deveAtualizarUsuarioComSucesso() {
-        UpdateUsuarioDto dto = new UpdateUsuarioDto("novoNome", "novoUsername", "novaSenha", "novaFoto.png");
+        UpdateUsuarioDto dto = new UpdateUsuarioDto("novoNome", "novoUsername", "novaSenha", null);
 
         when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
-        when(passwordEncoder.encode(anyString())).thenReturn("senhaNovaCriptografada");
+        when(passwordEncoder.encode("novaSenha")).thenReturn("senhaNovaCriptografada");
 
-        usuarioService.updateUsuarioById("1", dto);
+        usuarioService.updateUsuarioById(1L, dto);
 
         assertEquals("novoNome", usuario.getNome());
-        assertEquals("novaFoto.png", usuario.getFoto());
         assertEquals("novoUsername", usuario.getUsername());
         assertEquals("senhaNovaCriptografada", usuario.getSenha());
 
@@ -96,48 +100,51 @@ class UsuarioServiceTest {
     void deveLancarExcecao_AtualizarUsuarioNaoExistente() {
         when(usuarioRepository.findById(99L)).thenReturn(Optional.empty());
 
-        UpdateUsuarioDto dto = new UpdateUsuarioDto("nome", "foto", "username", "senha");
+        UpdateUsuarioDto dto = new UpdateUsuarioDto("nome", "username", "senha", null);
 
         assertThrows(ResourceNotFoundException.class, () -> {
-            usuarioService.updateUsuarioById("99", dto);
+            usuarioService.updateUsuarioById(99L, dto);
+        });
+    }
+
+    @Test
+    void deveLancarAccessDeniedException_AtualizarOutroUsuario() {
+        usuario.setUsername("outroUsuario");
+
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
+        UpdateUsuarioDto dto = new UpdateUsuarioDto("nome", "username", "senha", null);
+
+        assertThrows(AccessDeniedException.class, () -> {
+            usuarioService.updateUsuarioById(1L, dto);
         });
     }
 
     @Test
     void deveDeletarUsuarioComSucesso() {
-        when(usuarioRepository.existsById(1L)).thenReturn(true);
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
 
-        usuarioService.deleteById("1");
+        usuarioService.deleteById(1L);
 
         verify(usuarioRepository, times(1)).deleteById(1L);
     }
 
     @Test
     void deveLancarExcecao_UsuarioNaoExisteParaDelecao() {
-        when(usuarioRepository.existsById(99L)).thenReturn(false);
+        when(usuarioRepository.findById(99L)).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class, () -> {
-            usuarioService.deleteById("99");
+            usuarioService.deleteById(99L);
         });
     }
 
     @Test
-    void deveCarregarUsuarioPorUsernameOuEmail() {
-        when(usuarioRepository.findByUsernameOrEmail("joao", "joao"))
-                .thenReturn(Optional.of(usuario));
+    void deveLancarAccessDeniedException_DeletarOutroUsuario() {
+        usuario.setUsername("outroUsuario");
 
-        var userDetails = usuarioService.loadUserByUsername("joao");
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
 
-        assertEquals("joaozinho", userDetails.getUsername());
-    }
-
-    @Test
-    void deveLancarExcecao_UsuarioNaoEncontrado() {
-        when(usuarioRepository.findByUsernameOrEmail("naoexiste", "naoexiste"))
-                .thenReturn(Optional.empty());
-
-        assertThrows(UsernameNotFoundException.class, () -> {
-            usuarioService.loadUserByUsername("naoexiste");
+        assertThrows(AccessDeniedException.class, () -> {
+            usuarioService.deleteById(1L);
         });
     }
 }

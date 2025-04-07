@@ -24,38 +24,33 @@ public class UsuarioController {
 
     @PostMapping
     public ResponseEntity<Usuario> createUser(@RequestBody @Valid CreateUsuarioDto createUsuarioDto) {
-        var usuarioId = usuarioService.createUsuario(createUsuarioDto);
+        Long usuarioId = usuarioService.createUsuario(createUsuarioDto);
         return ResponseEntity.created(URI.create("/v1/usuarios/" + usuarioId)).build();
     }
 
     @GetMapping("/{usuarioId}")
-    public ResponseEntity<Usuario> getUsuarioById(@PathVariable String usuarioId) {
-        var usuario = usuarioService.getUsuarioById(usuarioId)
+    public ResponseEntity<Usuario> getUsuarioById(@PathVariable Long usuarioId) {
+        Usuario usuario = usuarioService.getUsuarioById(usuarioId)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado com ID: " + usuarioId));
         return ResponseEntity.ok(usuario);
     }
 
     @GetMapping
     public ResponseEntity<List<Usuario>> listUsuarios() {
-        var usuarios = usuarioService.listUsers();
+        List<Usuario> usuarios = usuarioService.listUsers();
         return ResponseEntity.ok(usuarios);
     }
 
     @PutMapping("/{usuarioId}")
-    public ResponseEntity<Void> updateUsuarioById(@PathVariable String usuarioId,
+    public ResponseEntity<Void> updateUsuarioById(@PathVariable Long usuarioId,
                                                   @RequestBody @Valid UpdateUsuarioDto updateUsuarioDto) {
         usuarioService.updateUsuarioById(usuarioId, updateUsuarioDto);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{usuarioId}")
-    public ResponseEntity<Void> deleteById(@PathVariable String usuarioId) {
+    public ResponseEntity<Void> deleteById(@PathVariable Long usuarioId) {
         usuarioService.deleteById(usuarioId);
         return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping("/protected")
-    public ResponseEntity<String> getProtectedEndpoint() {
-        return ResponseEntity.ok("Você acessou um endpoint protegido!");
     }
 }

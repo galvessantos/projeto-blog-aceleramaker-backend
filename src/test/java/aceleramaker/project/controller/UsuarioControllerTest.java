@@ -51,9 +51,9 @@ class UsuarioControllerTest {
         usuario.setId(1L);
         usuario.setNome("João");
 
-        when(usuarioService.getUsuarioById("1")).thenReturn(Optional.of(usuario));
+        when(usuarioService.getUsuarioById(1L)).thenReturn(Optional.of(usuario));
 
-        ResponseEntity<Usuario> response = usuarioController.getUsuarioById("1");
+        ResponseEntity<Usuario> response = usuarioController.getUsuarioById(1L);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(usuario, response.getBody());
@@ -61,9 +61,9 @@ class UsuarioControllerTest {
 
     @Test
     void testGetUsuarioById_NotFound() {
-        when(usuarioService.getUsuarioById("1")).thenReturn(Optional.empty());
+        when(usuarioService.getUsuarioById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> usuarioController.getUsuarioById("1"));
+        assertThrows(ResourceNotFoundException.class, () -> usuarioController.getUsuarioById(1L));
     }
 
     @Test
@@ -89,27 +89,19 @@ class UsuarioControllerTest {
                 "foto_nova.jpg"
         );
 
-        doNothing().when(usuarioService).updateUsuarioById("1", dto);
+        doNothing().when(usuarioService).updateUsuarioById(1L, dto);
 
-        ResponseEntity<Void> response = usuarioController.updateUsuarioById("1", dto);
+        ResponseEntity<Void> response = usuarioController.updateUsuarioById(1L, dto);
 
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
     }
 
     @Test
     void testDeleteById() {
-        doNothing().when(usuarioService).deleteById("1");
+        doNothing().when(usuarioService).deleteById(1L);
 
-        ResponseEntity<Void> response = usuarioController.deleteById("1");
+        ResponseEntity<Void> response = usuarioController.deleteById(1L);
 
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
-    }
-
-    @Test
-    void testGetProtectedEndpoint() {
-        ResponseEntity<String> response = usuarioController.getProtectedEndpoint();
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("Você acessou um endpoint protegido!", response.getBody());
     }
 }

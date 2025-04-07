@@ -6,90 +6,77 @@ import aceleramaker.project.entity.Usuario;
 import aceleramaker.project.enums.Role;
 import aceleramaker.project.exceptions.ResourceNotFoundException;
 import aceleramaker.project.repository.UsuarioRepository;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 @Service
-public class UsuarioService implements UserDetailsService {
+public class UsuarioService {
 
-    private final BCryptPasswordEncoder encoder;
     private final UsuarioRepository usuarioRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UsuarioService(BCryptPasswordEncoder encoder, UsuarioRepository usuarioRepository) {
-        this.encoder = encoder;
+    public UsuarioService(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
         this.usuarioRepository = usuarioRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
-    public Long createUsuario(CreateUsuarioDto createUsuarioDto) {
-        var entity = new Usuario(null,
-                createUsuarioDto.nome(),
-                createUsuarioDto.username(),
-                createUsuarioDto.email(),
-                encoder.encode(createUsuarioDto.senha()),
-                null,
-                Collections.emptyList(),
-                Instant.now(),
-                null,
-                Role.USER);
-
-        var usuarioSalvo = usuarioRepository.save(entity);
-        return usuarioSalvo.getId();
+    public Long createUsuario(CreateUsuarioDto dto) {
+        Usuario usuario = new Usuario();
+        usuario.setNome(dto.nome());
+        usuario.setUsername(dto.username());
+        usuario.setEmail(dto.email());
+        usuario.setSenha(passwordEncoder.encode(dto.senha()));
+        usuario.setRole(Role.USER);
+        return usuarioRepository.save(usuario).getId();
     }
 
-    public Optional<Usuario> getUsuarioById(String usuarioId) {
-        return usuarioRepository.findById(Long.valueOf(usuarioId));
+    public Optional<Usuario> getUsuarioById(Long usuarioId) {
+        return usuarioRepository.findById(usuarioId);
     }
 
     public List<Usuario> listUsers() {
         return usuarioRepository.findAll();
     }
 
-    public void updateUsuarioById(String usuarioId, UpdateUsuarioDto updateUsuarioDto) {
-        var id = Long.valueOf(usuarioId);
+    public void updateUsuarioById(Long usuarioId, UpdateUsuarioDto dto) {
+        Usuario usuario = usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
 
-        var usuario = usuarioRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado com ID: " + usuarioId));
+        String usernameLogado = getUsuarioLogadoUsername();
 
-        if (updateUsuarioDto.username() != null) {
-            usuario.setUsername(updateUsuarioDto.username());
+        if (!usuario.getUsername().equals(usernameLogado) && usuario.getRole() != Role.ADMIN) {
+            throw new AccessDeniedException("Acesso negado: você só pode editar sua própria conta.");
         }
 
-        if (updateUsuarioDto.foto() != null) {
-            usuario.setFoto(updateUsuarioDto.foto());
-        }
+        usuario.setNome(dto.nome());
+        usuario.setUsername(dto.username());
 
-        if (updateUsuarioDto.nome() != null) {
-            usuario.setNome(updateUsuarioDto.nome());
-        }
-
-        if (updateUsuarioDto.senha() != null) {
-            usuario.setSenha(encoder.encode(updateUsuarioDto.senha()));
+        if (dto.senha() != null && !dto.senha().isBlank()) {
+            usuario.setSenha(passwordEncoder.encode(dto.senha()));
         }
 
         usuarioRepository.save(usuario);
     }
 
-    public void deleteById(String usuarioId) {
-        var id = Long.valueOf(usuarioId);
+    public void deleteById(Long usuarioId) {
+        Usuario usuario = usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
 
-        if (!usuarioRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Usuário não encontrado com ID: " + usuarioId);
+        String usernameLogado = getUsuarioLogadoUsername();
+
+        if (!usuario.getUsername().equals(usernameLogado) && usuario.getRole() != Role.ADMIN) {
+            throw new AccessDeniedException("Acesso negado: você só pode excluir sua própria conta.");
         }
 
-        usuarioRepository.deleteById(id);
+        usuarioRepository.deleteById(usuarioId);
     }
 
-    @Override
-    public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
-        return usuarioRepository.findByUsernameOrEmail(login, login)
-                .orElseThrow(() -> new UsernameNotFoundException("Usuário ou Email não encontrado: " + login));
+    private String getUsuarioLogadoUsername() {
+        return SecurityContextHolder.getContext().getAuthentication().getName();
     }
 }
