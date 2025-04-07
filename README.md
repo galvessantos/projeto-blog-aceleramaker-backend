@@ -1,6 +1,6 @@
 # 📝 Projeto Blog Pessoal - Acelera Maker
 
-API RESTful desenvolvida com Java e Spring Boot para gerenciamento de usuários, temas e postagens. Projeto criado durante o **Bootcamp Acelera Maker** da empresa **Montreal**.
+API RESTful desenvolvida com Java e Spring Boot para gerenciar usuários, temas e postagens de um blog. Este projeto foi criado como parte do Bootcamp Acelera Maker, promovido pela empresa Montreal, com foco em boas práticas de desenvolvimento backend, segurança com JWT e organização em camadas.
 
 ## 🛠️ Tecnologias utilizadas
 
@@ -119,7 +119,7 @@ A documentação da API está disponível via Swagger:
 git clone https://github.com/galvessantos/projeto01-blog-aceleramaker.git
 
 # 2. Acesse a pasta do projeto
-cd projeto01-blog-aceleramaker
+cd projeto-blog-aceleramaker-backend
 
 # 3. Configure o banco de dados MySQL
 # Crie um schema chamado 'blog' e atualize o application.properties
