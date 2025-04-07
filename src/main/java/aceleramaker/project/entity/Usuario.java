@@ -14,7 +14,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "tb_users")
-public class Usuario implements UserDetails{
+public class Usuario implements UserDetails {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -48,21 +48,6 @@ public class Usuario implements UserDetails{
     @UpdateTimestamp
     private Instant updateTimestamp;
 
-    public Usuario() {
-    }
-
-    public Usuario(Long id, String nome, String username, String email, String senha, String foto, List<Postagem> postagens, Instant creationTimestamp, Instant updateTimestamp) {
-        this.id = id;
-        this.nome = nome;
-        this.username = username;
-        this.email = email;
-        this.senha = senha;
-        this.foto = foto;
-        this.postagens = postagens;
-        this.creationTimestamp = creationTimestamp;
-        this.updateTimestamp = updateTimestamp;
-    }
-
     public Usuario(Long id, String nome, String username, String email, String senha, String foto, List<Postagem> postagens, Instant creationTimestamp, Instant updateTimestamp, Role role) {
         this.id = id;
         this.nome = nome;
@@ -74,6 +59,18 @@ public class Usuario implements UserDetails{
         this.creationTimestamp = creationTimestamp;
         this.updateTimestamp = updateTimestamp;
         this.role = role;
+    }
+
+    public Usuario(Long id, String nome, String username, String email, String senha, String foto, Role role) {
+        this(id, nome, username, email, senha, foto, null, null, null, role);
+    }
+
+    public Usuario(String nome, String username, String email, String senha) {
+        this(null, nome, username, email, senha, null, null, null, null, Role.USER);
+    }
+
+    public Usuario() {
+
     }
 
     public Role getRole() {

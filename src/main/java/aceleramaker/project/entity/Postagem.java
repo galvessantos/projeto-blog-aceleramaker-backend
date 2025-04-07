@@ -50,6 +50,9 @@ public class Postagem {
         this.updateTimestamp = updateTimestamp;
     }
 
+    public Postagem(String s, String s1, Tema tema, Usuario usuario) {
+    }
+
     public Long getId() {
         return id;
     }
