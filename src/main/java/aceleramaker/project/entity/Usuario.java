@@ -1,6 +1,7 @@
 package aceleramaker.project.entity;
 
 import aceleramaker.project.enums.Role;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -12,39 +13,50 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 
+@Schema(description = "Entidade que representa um usuário da aplicação")
 @Entity
 @Table(name = "tb_users")
 public class Usuario implements UserDetails {
 
+    @Schema(description = "Papel do usuário (USER ou ADMIN)", example = "USER")
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role = Role.USER;
 
+    @Schema(description = "Identificador único do usuário", example = "1")
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Schema(description = "Nome completo do usuário", example = "João Silva")
     @Column(name = "nome", nullable = false)
     private String nome;
 
+    @Schema(description = "Nome de usuário (login)", example = "joaosilva")
     @Column(name = "username", nullable = false, unique = true)
     private String username;
 
+    @Schema(description = "Email do usuário", example = "joao@email.com")
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
+    @Schema(description = "Senha do usuário", example = "senha123")
     @Column(name = "senha", nullable = false)
     private String senha;
 
+    @Schema(description = "URL da foto do usuário", example = "https://example.com/foto.jpg")
     @Column(name = "foto")
     private String foto;
 
+    @Schema(description = "Lista de postagens associadas ao usuário")
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Postagem> postagens;
 
+    @Schema(description = "Data de criação do usuário")
     @CreationTimestamp
     private Instant creationTimestamp;
 
+    @Schema(description = "Data da última atualização do usuário")
     @UpdateTimestamp
     private Instant updateTimestamp;
 
@@ -62,7 +74,6 @@ public class Usuario implements UserDetails {
     }
 
     public Usuario() {
-
     }
 
     public Role getRole() {
@@ -99,6 +110,7 @@ public class Usuario implements UserDetails {
         return senha;
     }
 
+    @Override
     public String getUsername() {
         return username;
     }
