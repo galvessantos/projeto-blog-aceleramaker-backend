@@ -3,6 +3,7 @@ package aceleramaker.project.security;
 import aceleramaker.project.service.MyUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -32,6 +33,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/v1/usuarios/**").authenticated()
                         .requestMatchers("/v1/usuarios/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )

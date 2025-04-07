@@ -7,6 +7,7 @@ import aceleramaker.project.enums.Role;
 import aceleramaker.project.exceptions.ResourceNotFoundException;
 import aceleramaker.project.repository.UsuarioRepository;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -49,7 +50,7 @@ public class UsuarioService {
 
         String usernameLogado = getUsuarioLogadoUsername();
 
-        if (!usuario.getUsername().equals(usernameLogado) && usuario.getRole() != Role.ADMIN) {
+        if (!usuario.getUsername().equals(usernameLogado) && !isCurrentUserAdmin()) {
             throw new AccessDeniedException("Acesso negado: você só pode editar sua própria conta.");
         }
 
@@ -78,5 +79,11 @@ public class UsuarioService {
 
     private String getUsuarioLogadoUsername() {
         return SecurityContextHolder.getContext().getAuthentication().getName();
+    }
+
+    private boolean isCurrentUserAdmin() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication.getAuthorities().stream()
+                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
     }
 }

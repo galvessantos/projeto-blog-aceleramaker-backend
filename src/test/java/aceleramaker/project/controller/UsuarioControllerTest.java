@@ -3,11 +3,11 @@ package aceleramaker.project.controller;
 import aceleramaker.project.dto.CreateUsuarioDto;
 import aceleramaker.project.dto.UpdateUsuarioDto;
 import aceleramaker.project.entity.Usuario;
+import aceleramaker.project.enums.Role;
 import aceleramaker.project.exceptions.ResourceNotFoundException;
 import aceleramaker.project.service.UsuarioService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -21,11 +21,14 @@ class UsuarioControllerTest {
 
     private UsuarioService usuarioService;
     private UsuarioController usuarioController;
+    private Usuario principal;
 
     @BeforeEach
     void setUp() {
-        usuarioService = Mockito.mock(UsuarioService.class);
+        usuarioService = mock(UsuarioService.class);
         usuarioController = new UsuarioController(usuarioService);
+        principal = new Usuario();
+        principal.setId(1L);
     }
 
     @Test
@@ -36,11 +39,8 @@ class UsuarioControllerTest {
                 "joao@email.com",
                 "12345678"
         );
-
         when(usuarioService.createUsuario(any(CreateUsuarioDto.class))).thenReturn(1L);
-
-        ResponseEntity<Usuario> response = usuarioController.createUser(dto);
-
+        ResponseEntity<Void> response = usuarioController.createUser(dto);
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertEquals("/v1/usuarios/1", response.getHeaders().getLocation().toString());
     }
@@ -50,11 +50,8 @@ class UsuarioControllerTest {
         Usuario usuario = new Usuario();
         usuario.setId(1L);
         usuario.setNome("João");
-
         when(usuarioService.getUsuarioById(1L)).thenReturn(Optional.of(usuario));
-
         ResponseEntity<Usuario> response = usuarioController.getUsuarioById(1L);
-
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(usuario, response.getBody());
     }
@@ -62,7 +59,6 @@ class UsuarioControllerTest {
     @Test
     void testGetUsuarioById_NotFound() {
         when(usuarioService.getUsuarioById(1L)).thenReturn(Optional.empty());
-
         assertThrows(ResourceNotFoundException.class, () -> usuarioController.getUsuarioById(1L));
     }
 
@@ -71,11 +67,8 @@ class UsuarioControllerTest {
         Usuario u1 = new Usuario();
         Usuario u2 = new Usuario();
         List<Usuario> lista = List.of(u1, u2);
-
         when(usuarioService.listUsers()).thenReturn(lista);
-
         ResponseEntity<List<Usuario>> response = usuarioController.listUsuarios();
-
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(lista, response.getBody());
     }
@@ -88,20 +81,15 @@ class UsuarioControllerTest {
                 "novaSenha",
                 "foto_nova.jpg"
         );
-
         doNothing().when(usuarioService).updateUsuarioById(1L, dto);
-
         ResponseEntity<Void> response = usuarioController.updateUsuarioById(1L, dto);
-
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
     }
 
     @Test
     void testDeleteById() {
         doNothing().when(usuarioService).deleteById(1L);
-
-        ResponseEntity<Void> response = usuarioController.deleteById(1L);
-
+        ResponseEntity<Void> response = usuarioController.deleteById(1L, principal);
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
     }
 }

@@ -7,6 +7,9 @@ import aceleramaker.project.exceptions.ResourceNotFoundException;
 import aceleramaker.project.service.UsuarioService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -23,7 +26,7 @@ public class UsuarioController {
     }
 
     @PostMapping
-    public ResponseEntity<Usuario> createUser(@RequestBody @Valid CreateUsuarioDto createUsuarioDto) {
+    public ResponseEntity<Void> createUser(@RequestBody @Valid CreateUsuarioDto createUsuarioDto) {
         Long usuarioId = usuarioService.createUsuario(createUsuarioDto);
         return ResponseEntity.created(URI.create("/v1/usuarios/" + usuarioId)).build();
     }
@@ -49,7 +52,13 @@ public class UsuarioController {
     }
 
     @DeleteMapping("/{usuarioId}")
-    public ResponseEntity<Void> deleteById(@PathVariable Long usuarioId) {
+    public ResponseEntity<Void> deleteById(@PathVariable Long usuarioId,
+                                           @AuthenticationPrincipal UserDetails current) {
+        Usuario alvo = usuarioService.getUsuarioById(usuarioId)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado com ID: " + usuarioId));
+        if (!current.getUsername().equals(alvo.getUsername())) {
+            throw new AccessDeniedException("Você só pode excluir sua própria conta.");
+        }
         usuarioService.deleteById(usuarioId);
         return ResponseEntity.noContent().build();
     }
