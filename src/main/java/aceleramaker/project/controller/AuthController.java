@@ -23,7 +23,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
-@Tag(name = "Autenticação", description = "Endpoints de login e registro")
+@Tag(name = "01 - Autenticação", description = "Endpoints de login e registro de usuário")
 public class AuthController {
 
     private final AuthenticationManager authenticationManager;
@@ -43,11 +43,7 @@ public class AuthController {
                     @ApiResponse(responseCode = "400", description = "Credenciais inválidas")
             }
     )
-    @io.swagger.v3.oas.annotations.parameters.RequestBody(
-            required = true,
-            content = @Content(schema = @Schema(implementation = LoginDto.class))
-    )
-    public ResponseEntity<LoginRespostaDto> login(@org.springframework.web.bind.annotation.RequestBody @Valid LoginDto loginDto) {
+    public ResponseEntity<LoginRespostaDto> login(@RequestBody @Valid LoginDto loginDto) {
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginDto.login(), loginDto.senha())
@@ -66,13 +62,9 @@ public class AuthController {
                     @ApiResponse(responseCode = "400", description = "Erro ao registrar usuário")
             }
     )
-    @io.swagger.v3.oas.annotations.parameters.RequestBody(
-            required = true,
-            content = @Content(schema = @Schema(implementation = CreateUsuarioDto.class))
-    )
-    public ResponseEntity<Map<String, String>> register(@org.springframework.web.bind.annotation.RequestBody @Valid CreateUsuarioDto createUsuarioDto) {
+    public ResponseEntity<Map<String, String>> register(@RequestBody @Valid CreateUsuarioDto createUsuarioDto) {
         try {
-            var usuarioId = usuarioService.createUsuario(createUsuarioDto);
+            Long usuarioId = usuarioService.createUsuario(createUsuarioDto);
             Map<String, String> response = Map.of("message", "Usuário registrado com sucesso!");
             return ResponseEntity.created(URI.create("/v1/usuarios/" + usuarioId)).body(response);
         } catch (Exception e) {

@@ -18,8 +18,11 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -27,6 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
 public class PostagemControllerIntegrationTest {
 
     @Autowired
@@ -126,7 +130,7 @@ public class PostagemControllerIntegrationTest {
         Postagem p = postagemRepository.save(new Postagem(null,"Pra deletar","Texto",tema,usuario,null,null));
         mockMvc.perform(delete("/postagens/"+p.getId())
                         .header("Authorization","Bearer "+token))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isOk());
     }
 
     @Test

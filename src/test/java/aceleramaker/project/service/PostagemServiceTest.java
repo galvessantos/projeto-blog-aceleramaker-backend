@@ -36,7 +36,8 @@ class PostagemServiceTest {
     @BeforeEach
     void setUp() {
         tema = new Tema(1L, "Programação", new ArrayList<>());
-        usuario = new Usuario(1L, "João", "joao", "joao@email.com", "senha", "foto", new ArrayList<>(), null, null, null);
+        usuario = new Usuario(1L, "João", "joao", "joao@email.com",
+                "senha", "foto", new ArrayList<>(), null, null, null);
         postagem = new Postagem();
         postagem.setId(1L);
         postagem.setTitulo("Título");
@@ -49,20 +50,15 @@ class PostagemServiceTest {
     void deveListarTodasAsPostagens() {
         Pageable pageable = PageRequest.of(0, 10);
         Page<Postagem> page = new PageImpl<>(List.of(postagem));
-
         when(postagemRepository.findAll(pageable)).thenReturn(page);
-
         var resultado = postagemService.listarTodas(pageable);
-
         assertEquals(1, resultado.getTotalElements());
     }
 
     @Test
     void deveBuscarPostagemPorId() {
         when(postagemRepository.findById(1L)).thenReturn(Optional.of(postagem));
-
         var resultado = postagemService.buscarPorId(1L);
-
         assertTrue(resultado.isPresent());
         assertEquals("Título", resultado.get().getTitulo());
     }
@@ -71,24 +67,18 @@ class PostagemServiceTest {
     void deveBuscarPostagemPorTitulo() {
         Pageable pageable = PageRequest.of(0, 10);
         Page<Postagem> page = new PageImpl<>(List.of(postagem));
-
         when(postagemRepository.findByTituloContainingIgnoreCase("título", pageable)).thenReturn(page);
-
         var resultado = postagemService.buscarPorTitulo("título", pageable);
-
         assertEquals(1, resultado.getTotalElements());
     }
 
     @Test
     void deveCriarPostagemComSucesso() {
         CreatePostagemDto dto = new CreatePostagemDto("Novo título", "Novo texto", 1L, 1L);
-
         when(temaRepository.findById(1L)).thenReturn(Optional.of(tema));
         when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
         when(postagemRepository.save(any(Postagem.class))).thenReturn(postagem);
-
-        Postagem criada = postagemService.criar(dto);
-
+        Postagem criada = postagemService.criar(dto, usuario.getUsername());
         assertEquals("Título", criada.getTitulo());
         verify(postagemRepository).save(any(Postagem.class));
     }
@@ -96,30 +86,25 @@ class PostagemServiceTest {
     @Test
     void deveLancarExcecao_QuandoTemaNaoExisteNaCriacao() {
         CreatePostagemDto dto = new CreatePostagemDto("Titulo", "Texto", 99L, 1L);
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
         when(temaRepository.findById(99L)).thenReturn(Optional.empty());
-
-        assertThrows(ResourceNotFoundException.class, () -> postagemService.criar(dto));
+        assertThrows(ResourceNotFoundException.class, () -> postagemService.criar(dto, usuario.getUsername()));
     }
 
     @Test
     void deveLancarExcecao_QuandoUsuarioNaoExisteNaCriacao() {
         CreatePostagemDto dto = new CreatePostagemDto("Titulo", "Texto", 1L, 99L);
-        when(temaRepository.findById(1L)).thenReturn(Optional.of(tema));
         when(usuarioRepository.findById(99L)).thenReturn(Optional.empty());
-
-        assertThrows(ResourceNotFoundException.class, () -> postagemService.criar(dto));
+        assertThrows(ResourceNotFoundException.class, () -> postagemService.criar(dto, usuario.getUsername()));
     }
 
     @Test
     void deveAtualizarPostagemComSucesso() {
         UpdatePostagemDto dto = new UpdatePostagemDto("Atualizado", "Texto atualizado", 1L);
-
         when(postagemRepository.findById(1L)).thenReturn(Optional.of(postagem));
         when(temaRepository.findById(1L)).thenReturn(Optional.of(tema));
         when(postagemRepository.save(any(Postagem.class))).thenReturn(postagem);
-
         Optional<Postagem> atualizada = postagemService.atualizar(1L, dto);
-
         assertTrue(atualizada.isPresent());
         assertEquals("Atualizado", atualizada.get().getTitulo());
     }
@@ -127,26 +112,21 @@ class PostagemServiceTest {
     @Test
     void deveLancarExcecao_QuandoTemaNaoExisteNaAtualizacao() {
         UpdatePostagemDto dto = new UpdatePostagemDto("Atualizado", "Texto", 99L);
-
         when(postagemRepository.findById(1L)).thenReturn(Optional.of(postagem));
         when(temaRepository.findById(99L)).thenReturn(Optional.empty());
-
         assertThrows(ResourceNotFoundException.class, () -> postagemService.atualizar(1L, dto));
     }
 
     @Test
     void deveDeletarPostagemComSucesso() {
         when(postagemRepository.existsById(1L)).thenReturn(true);
-
         postagemService.deletar(1L);
-
         verify(postagemRepository).deleteById(1L);
     }
 
     @Test
     void deveLancarExcecao_AoDeletarPostagemInexistente() {
         when(postagemRepository.existsById(99L)).thenReturn(false);
-
         assertThrows(ResourceNotFoundException.class, () -> postagemService.deletar(99L));
     }
 
@@ -154,11 +134,8 @@ class PostagemServiceTest {
     void deveBuscarPostagensPorTema() {
         Pageable pageable = PageRequest.of(0, 10);
         Page<Postagem> page = new PageImpl<>(List.of(postagem));
-
         when(postagemRepository.findByTemaId(1L, pageable)).thenReturn(page);
-
         var resultado = postagemService.buscarPorTema(1L, pageable);
-
         assertEquals(1, resultado.getTotalElements());
     }
 
@@ -166,11 +143,8 @@ class PostagemServiceTest {
     void deveBuscarPostagensPorUsuario() {
         Pageable pageable = PageRequest.of(0, 10);
         Page<Postagem> page = new PageImpl<>(List.of(postagem));
-
         when(postagemRepository.findByUsuarioId(1L, pageable)).thenReturn(page);
-
         var resultado = postagemService.buscarPorUsuario(1L, pageable);
-
         assertEquals(1, resultado.getTotalElements());
     }
 }

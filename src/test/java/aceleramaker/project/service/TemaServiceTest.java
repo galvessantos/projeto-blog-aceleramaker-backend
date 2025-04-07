@@ -30,16 +30,14 @@ class TemaServiceTest {
         tema = new Tema();
         tema.setId(1L);
         tema.setDescricao("Tecnologia");
+        tema.setPostagens(new ArrayList<>());
     }
 
     @Test
     void deveCriarTemaComSucesso() {
         CreateTemaDto dto = new CreateTemaDto("Tecnologia");
-
         when(temaRepository.save(any(Tema.class))).thenReturn(tema);
-
         Tema resultado = temaService.criar(dto);
-
         assertNotNull(resultado);
         assertEquals("Tecnologia", resultado.getDescricao());
         verify(temaRepository, times(1)).save(any(Tema.class));
@@ -48,9 +46,7 @@ class TemaServiceTest {
     @Test
     void deveListarTodosTemas() {
         when(temaRepository.findAll()).thenReturn(List.of(tema));
-
         List<Tema> temas = temaService.listarTodos();
-
         assertEquals(1, temas.size());
         verify(temaRepository).findAll();
     }
@@ -58,12 +54,9 @@ class TemaServiceTest {
     @Test
     void deveAtualizarTemaComSucesso() {
         CreateTemaDto dto = new CreateTemaDto("Atualizado");
-
         when(temaRepository.findById(1L)).thenReturn(Optional.of(tema));
         when(temaRepository.save(any(Tema.class))).thenReturn(tema);
-
         Optional<Tema> atualizado = temaService.atualizar(1L, dto);
-
         assertTrue(atualizado.isPresent());
         assertEquals("Atualizado", atualizado.get().getDescricao());
         verify(temaRepository).save(tema);
@@ -72,34 +65,28 @@ class TemaServiceTest {
     @Test
     void deveLancarExcecao_AtualizarTemaInexistente() {
         CreateTemaDto dto = new CreateTemaDto("Novo");
-
         when(temaRepository.findById(99L)).thenReturn(Optional.empty());
-
         assertThrows(ResourceNotFoundException.class, () -> temaService.atualizar(99L, dto));
     }
 
     @Test
     void deveDeletarTemaComSucesso() {
-        when(temaRepository.existsById(1L)).thenReturn(true);
-
+        tema.setPostagens(new ArrayList<>());
+        when(temaRepository.findById(1L)).thenReturn(Optional.of(tema));
         temaService.deletar(1L);
-
         verify(temaRepository).deleteById(1L);
     }
 
     @Test
     void deveLancarExcecao_DeletarTemaInexistente() {
-        when(temaRepository.existsById(99L)).thenReturn(false);
-
+        when(temaRepository.findById(99L)).thenReturn(Optional.empty());
         assertThrows(ResourceNotFoundException.class, () -> temaService.deletar(99L));
     }
 
     @Test
     void deveBuscarTemaPorId() {
         when(temaRepository.findById(1L)).thenReturn(Optional.of(tema));
-
         Optional<Tema> encontrado = temaService.buscarPorId(1L);
-
         assertTrue(encontrado.isPresent());
         assertEquals("Tecnologia", encontrado.get().getDescricao());
     }
@@ -107,9 +94,7 @@ class TemaServiceTest {
     @Test
     void deveBuscarTemasPorDescricaoParcial() {
         when(temaRepository.findByDescricaoContainingIgnoreCase("tec")).thenReturn(List.of(tema));
-
         List<Tema> resultados = temaService.buscarPorDescricaoParcial("tec");
-
         assertEquals(1, resultados.size());
         assertEquals("Tecnologia", resultados.get(0).getDescricao());
     }

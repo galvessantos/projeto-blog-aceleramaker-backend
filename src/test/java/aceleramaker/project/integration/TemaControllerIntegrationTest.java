@@ -5,6 +5,7 @@ import aceleramaker.project.dto.UpdateTemaDto;
 import aceleramaker.project.entity.Tema;
 import aceleramaker.project.entity.Usuario;
 import aceleramaker.project.enums.Role;
+import aceleramaker.project.repository.PostagemRepository;
 import aceleramaker.project.repository.TemaRepository;
 import aceleramaker.project.repository.UsuarioRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,8 +16,11 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -24,10 +28,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
 public class TemaControllerIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private PostagemRepository postagemRepository;
 
     @Autowired
     private TemaRepository temaRepository;
@@ -45,6 +53,7 @@ public class TemaControllerIntegrationTest {
 
     @BeforeEach
     void setUp() throws Exception {
+        postagemRepository.deleteAll();
         temaRepository.deleteAll();
         usuarioRepository.deleteAll();
 

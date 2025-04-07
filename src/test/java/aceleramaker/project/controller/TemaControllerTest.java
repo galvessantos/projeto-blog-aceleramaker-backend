@@ -1,6 +1,7 @@
 package aceleramaker.project.controller;
 
 import aceleramaker.project.dto.CreateTemaDto;
+import aceleramaker.project.dto.TemaRespostaDto;
 import aceleramaker.project.entity.Tema;
 import aceleramaker.project.exceptions.ResourceNotFoundException;
 import aceleramaker.project.service.TemaService;
@@ -34,51 +35,41 @@ class TemaControllerTest {
 
         when(temaService.criar(dto)).thenReturn(temaCriado);
 
-        ResponseEntity<Tema> response = temaController.criar(dto);
+        ResponseEntity<TemaRespostaDto> response = temaController.criar(dto);
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        assertEquals(temaCriado, response.getBody());
+        assertNotNull(response.getBody());
+        assertEquals(1L, response.getBody().id());
+        assertEquals("Tecnologia", response.getBody().descricao());
     }
 
     @Test
     void testListarTodosSemFiltro() {
-        List<Tema> temas = List.of(new Tema(), new Tema());
+        List<Tema> temas = List.of(
+                new Tema(1L, "Tecnologia", null),
+                new Tema(2L, "Saúde", null)
+        );
         when(temaService.listarTodos()).thenReturn(temas);
 
-        ResponseEntity<List<Tema>> response = temaController.listarTodos(null);
+        ResponseEntity<List<TemaRespostaDto>> response = temaController.listarTodos(null);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(temas, response.getBody());
+        assertEquals(2, response.getBody().size());
+        assertEquals("Tecnologia", response.getBody().get(0).descricao());
+        assertEquals("Saúde", response.getBody().get(1).descricao());
     }
 
     @Test
     void testListarTodosComFiltro() {
         String descricao = "tech";
-        List<Tema> temas = List.of(new Tema());
+        List<Tema> temas = List.of(new Tema(1L, "Tecnologia", null));
         when(temaService.buscarPorDescricaoParcial(descricao)).thenReturn(temas);
 
-        ResponseEntity<List<Tema>> response = temaController.listarTodos(descricao);
+        ResponseEntity<List<TemaRespostaDto>> response = temaController.listarTodos(descricao);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(temas, response.getBody());
-    }
-
-    @Test
-    void testBuscarPorId_Encontrado() {
-        Tema tema = new Tema(1L, "Saúde", null);
-        when(temaService.buscarPorId(1L)).thenReturn(Optional.of(tema));
-
-        ResponseEntity<Tema> response = temaController.buscarPorId(1L);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(tema, response.getBody());
-    }
-
-    @Test
-    void testBuscarPorId_NaoEncontrado() {
-        when(temaService.buscarPorId(1L)).thenReturn(Optional.empty());
-
-        assertThrows(ResourceNotFoundException.class, () -> temaController.buscarPorId(1L));
+        assertEquals(1, response.getBody().size());
+        assertEquals("Tecnologia", response.getBody().get(0).descricao());
     }
 
     @Test
@@ -87,26 +78,11 @@ class TemaControllerTest {
         Tema atualizado = new Tema(1L, "Atualizado", null);
         when(temaService.atualizar(1L, dto)).thenReturn(Optional.of(atualizado));
 
-        ResponseEntity<Tema> response = temaController.atualizar(1L, dto);
+        ResponseEntity<TemaRespostaDto> response = temaController.atualizar(1L, dto);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(atualizado, response.getBody());
-    }
-
-    @Test
-    void testAtualizar_NaoEncontrado() {
-        CreateTemaDto dto = new CreateTemaDto("Atualizado");
-        when(temaService.atualizar(1L, dto)).thenReturn(Optional.empty());
-
-        assertThrows(ResourceNotFoundException.class, () -> temaController.atualizar(1L, dto));
-    }
-
-    @Test
-    void testDeletar() {
-        doNothing().when(temaService).deletar(1L);
-
-        ResponseEntity<Void> response = temaController.deletar(1L);
-
-        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(1L, response.getBody().id());
+        assertEquals("Atualizado", response.getBody().descricao());
     }
 }

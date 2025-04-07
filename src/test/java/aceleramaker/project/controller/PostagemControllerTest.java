@@ -1,7 +1,10 @@
 package aceleramaker.project.controller;
 
 import aceleramaker.project.dto.CreatePostagemDto;
+import aceleramaker.project.dto.PostagemRespostaDto;
 import aceleramaker.project.dto.UpdatePostagemDto;
+import aceleramaker.project.dto.TemaRespostaDto;
+import aceleramaker.project.dto.UsuarioRespostaDto;
 import aceleramaker.project.entity.Postagem;
 import aceleramaker.project.entity.Tema;
 import aceleramaker.project.entity.Usuario;
@@ -12,12 +15,18 @@ import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 class PostagemControllerTest {
@@ -34,107 +43,213 @@ class PostagemControllerTest {
     @Test
     void testCriar() {
         CreatePostagemDto dto = new CreatePostagemDto("Título", "Texto", 1L, 1L);
+
+        Usuario usuario = new Usuario();
+        usuario.setId(1L);
+        usuario.setNome("Fulano");
+        usuario.setUsername("fulano");
+        usuario.setCreationTimestamp(Instant.now());
+
+        Tema tema = new Tema();
+        tema.setId(1L);
+        tema.setDescricao("Tecnologia");
+
         Postagem postagem = new Postagem(
                 1L,
                 "Título",
                 "Texto",
-                new Tema(),
-                new Usuario(),
+                tema,
+                usuario,
                 LocalDateTime.now(),
                 LocalDateTime.now()
         );
 
-        when(postagemService.criar(dto)).thenReturn(postagem);
+        PostagemRespostaDto respostaDto = new PostagemRespostaDto(
+                postagem.getId(),
+                postagem.getTitulo(),
+                postagem.getTexto(),
+                new TemaRespostaDto(tema.getId(), tema.getDescricao()),
+                new UsuarioRespostaDto(usuario.getNome(), usuario.getFoto(), usuario.getCreationTimestamp()),
+                postagem.getCreationTimestamp(),
+                postagem.getUpdateTimestamp()
+        );
 
-        ResponseEntity<Postagem> response = postagemController.criar(dto);
+        UserDetails userDetails = mock(UserDetails.class);
+        when(userDetails.getUsername()).thenReturn("fulano");
+
+        when(postagemService.criarDto(dto, "fulano")).thenReturn(respostaDto);
+
+        ResponseEntity<PostagemRespostaDto> response = postagemController.criar(dto, userDetails);
 
         assertEquals(201, response.getStatusCodeValue());
-        assertEquals(postagem, response.getBody());
-        verify(postagemService).criar(dto);
+        PostagemRespostaDto body = response.getBody();
+        assertNotNull(body);
+        assertEquals("Título", body.titulo());
+        assertEquals("Texto", body.texto());
+        assertEquals("Tecnologia", body.tema().descricao());
+        assertEquals("Fulano", body.usuario().nome());
+
+        verify(postagemService).criarDto(dto, "fulano");
     }
 
     @Test
     void testListarTodas() {
-        Page<Postagem> page = new PageImpl<>(List.of(new Postagem()));
+        PostagemRespostaDto dto = new PostagemRespostaDto(
+                1L,
+                "Título",
+                "Texto",
+                new TemaRespostaDto(1L, "Tecnologia"),
+                new UsuarioRespostaDto("Fulano", null, Instant.now()),
+                LocalDateTime.now(),
+                LocalDateTime.now()
+        );
+        Page<PostagemRespostaDto> page = new PageImpl<>(List.of(dto));
         when(postagemService.listarTodas(any())).thenReturn(page);
 
-        ResponseEntity<Page<Postagem>> response = postagemController.listarTodas(null, PageRequest.of(0, 10));
+        ResponseEntity<Page<PostagemRespostaDto>> response = postagemController.listarTodas(null, PageRequest.of(0, 10));
 
         assertEquals(200, response.getStatusCodeValue());
-        assertEquals(page, response.getBody());
+        assertNotNull(response.getBody());
+        assertEquals(1, response.getBody().getContent().size());
+        assertEquals("Título", response.getBody().getContent().get(0).titulo());
+
         verify(postagemService).listarTodas(any());
     }
 
     @Test
     void testBuscarPorTitulo() {
-        Page<Postagem> page = new PageImpl<>(List.of(new Postagem()));
+        PostagemRespostaDto dto = new PostagemRespostaDto(
+                1L,
+                "Título",
+                "Texto",
+                new TemaRespostaDto(1L, "Tecnologia"),
+                new UsuarioRespostaDto("Fulano", null, Instant.now()),
+                LocalDateTime.now(),
+                LocalDateTime.now()
+        );
+        Page<PostagemRespostaDto> page = new PageImpl<>(List.of(dto));
         when(postagemService.buscarPorTitulo(eq("teste"), any())).thenReturn(page);
 
-        ResponseEntity<Page<Postagem>> response = postagemController.listarTodas("teste", PageRequest.of(0, 10));
+        ResponseEntity<Page<PostagemRespostaDto>> response = postagemController.listarTodas("teste", PageRequest.of(0, 10));
 
         assertEquals(200, response.getStatusCodeValue());
-        assertEquals(page, response.getBody());
+        assertNotNull(response.getBody());
+        assertEquals(1, response.getBody().getContent().size());
+        assertEquals("Título", response.getBody().getContent().get(0).titulo());
+
         verify(postagemService).buscarPorTitulo(eq("teste"), any());
     }
 
     @Test
     void testBuscarPorId() {
+        Usuario usuario = new Usuario();
+        usuario.setId(1L);
+        usuario.setNome("Fulano");
+        usuario.setUsername("fulano");
+        usuario.setCreationTimestamp(Instant.now());
+
+        Tema tema = new Tema();
+        tema.setId(1L);
+        tema.setDescricao("Tecnologia");
+
         Postagem postagem = new Postagem(
                 1L,
                 "Título",
                 "Texto",
-                new Tema(),
-                new Usuario(),
+                tema,
+                usuario,
                 LocalDateTime.now(),
                 LocalDateTime.now()
         );
-        when(postagemService.buscarPorId(1L)).thenReturn(Optional.of(postagem));
 
-        ResponseEntity<Postagem> response = postagemController.buscarPorId(1L);
+        PostagemRespostaDto respostaDto = new PostagemRespostaDto(
+                postagem.getId(),
+                postagem.getTitulo(),
+                postagem.getTexto(),
+                new TemaRespostaDto(tema.getId(), tema.getDescricao()),
+                new UsuarioRespostaDto(usuario.getNome(), usuario.getFoto(), usuario.getCreationTimestamp()),
+                postagem.getCreationTimestamp(),
+                postagem.getUpdateTimestamp()
+        );
+
+        when(postagemService.buscarPorIdDto(1L)).thenReturn(Optional.of(respostaDto));
+
+        ResponseEntity<PostagemRespostaDto> response = postagemController.buscarPorId(1L);
 
         assertEquals(200, response.getStatusCodeValue());
-        assertEquals(postagem, response.getBody());
-        verify(postagemService).buscarPorId(1L);
+        assertEquals(respostaDto, response.getBody());
+        verify(postagemService).buscarPorIdDto(1L);
     }
 
     @Test
     void testAtualizar() {
         UpdatePostagemDto dto = new UpdatePostagemDto("Novo Título", "Novo Texto", 1L);
+        Usuario usuario = new Usuario();
+        usuario.setId(1L);
+        usuario.setNome("Fulano");
+        usuario.setUsername("fulano");
+        usuario.setCreationTimestamp(Instant.now());
+
+        Tema tema = new Tema();
+        tema.setId(1L);
+        tema.setDescricao("Tecnologia");
+
         Postagem postagemAtualizada = new Postagem(
                 1L,
                 "Novo Título",
                 "Novo Texto",
-                new Tema(),
-                new Usuario(),
+                tema,
+                usuario,
                 LocalDateTime.now(),
                 LocalDateTime.now()
         );
 
-        when(postagemService.atualizar(eq(1L), eq(dto))).thenReturn(Optional.of(postagemAtualizada));
+        PostagemRespostaDto respostaDto = new PostagemRespostaDto(
+                postagemAtualizada.getId(),
+                postagemAtualizada.getTitulo(),
+                postagemAtualizada.getTexto(),
+                new TemaRespostaDto(tema.getId(), tema.getDescricao()),
+                new UsuarioRespostaDto(usuario.getNome(), usuario.getFoto(), usuario.getCreationTimestamp()),
+                postagemAtualizada.getCreationTimestamp(),
+                postagemAtualizada.getUpdateTimestamp()
+        );
 
-        ResponseEntity<Postagem> response = postagemController.atualizar(1L, dto);
+        when(postagemService.atualizarDto(eq(1L), eq(dto))).thenReturn(Optional.of(respostaDto));
+
+        ResponseEntity<PostagemRespostaDto> response = postagemController.atualizar(1L, dto);
 
         assertEquals(200, response.getStatusCodeValue());
-        assertEquals(postagemAtualizada, response.getBody());
-        verify(postagemService).atualizar(1L, dto);
+        assertEquals(respostaDto, response.getBody());
+        verify(postagemService).atualizarDto(1L, dto);
     }
 
     @Test
     void testDeletar() {
         doNothing().when(postagemService).deletar(1L);
 
-        ResponseEntity<Void> response = postagemController.deletar(1L);
+        ResponseEntity<Map<String, String>> response = postagemController.deletar(1L);
 
-        assertEquals(204, response.getStatusCodeValue());
+        assertEquals(200, response.getStatusCodeValue());
+        assertNotNull(response.getBody());
+        assertEquals("Postagem excluída com sucesso.", response.getBody().get("mensagem"));
         verify(postagemService).deletar(1L);
     }
 
     @Test
     void testBuscarPorTema() {
-        Page<Postagem> page = new PageImpl<>(List.of(new Postagem()));
+        PostagemRespostaDto dto = new PostagemRespostaDto(
+                1L,
+                "Título",
+                "Texto",
+                new TemaRespostaDto(1L, "Tecnologia"),
+                new UsuarioRespostaDto("Fulano", null, Instant.now()),
+                LocalDateTime.now(),
+                LocalDateTime.now()
+        );
+        Page<PostagemRespostaDto> page = new PageImpl<>(List.of(dto));
         when(postagemService.buscarPorTema(eq(1L), any())).thenReturn(page);
 
-        ResponseEntity<Page<Postagem>> response = postagemController.buscarPorTema(1L, PageRequest.of(0, 10));
+        ResponseEntity<Page<PostagemRespostaDto>> response = postagemController.buscarPorTema(1L, PageRequest.of(0, 10));
 
         assertEquals(200, response.getStatusCodeValue());
         assertEquals(page, response.getBody());
@@ -143,10 +258,19 @@ class PostagemControllerTest {
 
     @Test
     void testBuscarPorUsuario() {
-        Page<Postagem> page = new PageImpl<>(List.of(new Postagem()));
+        PostagemRespostaDto dto = new PostagemRespostaDto(
+                1L,
+                "Título",
+                "Texto",
+                new TemaRespostaDto(1L, "Tecnologia"),
+                new UsuarioRespostaDto("Fulano", null, Instant.now()),
+                LocalDateTime.now(),
+                LocalDateTime.now()
+        );
+        Page<PostagemRespostaDto> page = new PageImpl<>(List.of(dto));
         when(postagemService.buscarPorUsuario(eq(1L), any())).thenReturn(page);
 
-        ResponseEntity<Page<Postagem>> response = postagemController.buscarPorUsuario(1L, PageRequest.of(0, 10));
+        ResponseEntity<Page<PostagemRespostaDto>> response = postagemController.buscarPorUsuario(1L, PageRequest.of(0, 10));
 
         assertEquals(200, response.getStatusCodeValue());
         assertEquals(page, response.getBody());
@@ -155,29 +279,25 @@ class PostagemControllerTest {
 
     @Test
     void testBuscarPorId_NotFound() {
-        when(postagemService.buscarPorId(99L)).thenReturn(Optional.empty());
+        when(postagemService.buscarPorIdDto(99L)).thenReturn(Optional.empty());
 
-        ResourceNotFoundException exception = assertThrows(
-                ResourceNotFoundException.class,
-                () -> postagemController.buscarPorId(99L)
-        );
+        assertThrows(ResourceNotFoundException.class, () -> {
+            postagemController.buscarPorId(99L);
+        });
 
-        assertEquals("Postagem não encontrada", exception.getMessage());
-        verify(postagemService).buscarPorId(99L);
+        verify(postagemService).buscarPorIdDto(99L);
     }
 
     @Test
     void testAtualizar_NotFound() {
         UpdatePostagemDto dto = new UpdatePostagemDto("Novo Título", "Novo Texto", 1L);
 
-        when(postagemService.atualizar(eq(99L), eq(dto))).thenReturn(Optional.empty());
+        when(postagemService.atualizarDto(99L, dto)).thenReturn(Optional.empty());
 
-        ResourceNotFoundException exception = assertThrows(
-                ResourceNotFoundException.class,
-                () -> postagemController.atualizar(99L, dto)
-        );
+        assertThrows(ResourceNotFoundException.class, () -> {
+            postagemController.atualizar(99L, dto);
+        });
 
-        assertEquals("Postagem não encontrada", exception.getMessage());
-        verify(postagemService).atualizar(99L, dto);
+        verify(postagemService).atualizarDto(99L, dto);
     }
 }

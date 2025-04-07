@@ -36,6 +36,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<String> handleAccessDeniedException(AccessDeniedException ex) {
-        return new ResponseEntity<>("Acesso negado: você só pode excluir sua própria conta.", HttpStatus.FORBIDDEN);
+        return new ResponseEntity<>("Acesso negado: você não tem permissão para acessar este recurso.", HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(AccessDeniedCustomException.class)
+    public ResponseEntity<String> handleAccessDeniedCustomException(AccessDeniedCustomException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
     }
 }

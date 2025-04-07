@@ -2,6 +2,7 @@ package aceleramaker.project.service;
 
 import aceleramaker.project.dto.CreateTemaDto;
 import aceleramaker.project.entity.Tema;
+import aceleramaker.project.exceptions.BadRequestException;
 import aceleramaker.project.exceptions.ResourceNotFoundException;
 import aceleramaker.project.repository.TemaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,9 +37,13 @@ public class TemaService {
     }
 
     public void deletar(Long id) {
-        if (!temaRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Tema não encontrado com ID: " + id);
+        Tema tema = temaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Tema não encontrado com ID: " + id));
+
+        if (tema.getPostagens() != null && !tema.getPostagens().isEmpty()) {
+            throw new BadRequestException("Não é possível deletar um tema com postagens associadas.");
         }
+
         temaRepository.deleteById(id);
     }
 
