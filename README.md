@@ -82,7 +82,7 @@ Principais funcionalidades:
 
 ```bash
 # 1. Clone o repositório
-git clone https://github.com/seu-usuario/projeto01-blog-aceleramaker.git
+git clone https://github.com/galvessantos/projeto01-blog-aceleramaker.git
 
 # 2. Acesse a pasta do projeto
 cd projeto01-blog-aceleramaker
