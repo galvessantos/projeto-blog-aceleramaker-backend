@@ -50,7 +50,7 @@ A documentação da API está disponível via Swagger:
 
 🔗 [`http://localhost:8080/swagger-ui/index.html`](http://localhost:8080/swagger-ui/index.html)
 
-![Image](https://github.com/user-attachments/assets/9dbb77da-9400-480a-99ba-a34a07d61742)
+![Image](https://github.com/user-attachments/assets/0e036455-44e7-4893-9942-44738f6f5364)
 
 ## 🔐 Autenticação `(/auth)`
 - POST /login – Autenticar e gerar JWT
