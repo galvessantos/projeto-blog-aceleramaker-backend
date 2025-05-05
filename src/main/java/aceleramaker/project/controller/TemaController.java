@@ -20,6 +20,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/temas")
 @Tag(name = "04 - Temas", description = "Operações relacionadas aos temas das postagens")
+@CrossOrigin(origins = "http://localhost:4200")
 public class TemaController {
 
     private final TemaService temaService;

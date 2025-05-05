@@ -5,6 +5,7 @@ import aceleramaker.project.dto.UsuarioRespostaDto;
 import aceleramaker.project.entity.Usuario;
 import aceleramaker.project.exceptions.AccessDeniedCustomException;
 import aceleramaker.project.exceptions.ResourceNotFoundException;
+import aceleramaker.project.repository.UsuarioRepository;
 import aceleramaker.project.service.UsuarioService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.Instant;
 import java.util.List;
@@ -23,12 +25,16 @@ import static org.mockito.Mockito.*;
 class UsuarioControllerTest {
 
     private UsuarioService usuarioService;
+    private UsuarioRepository usuarioRepository;
+    private PasswordEncoder passwordEncoder;
     private UsuarioController usuarioController;
 
     @BeforeEach
     void setUp() {
         usuarioService = mock(UsuarioService.class);
-        usuarioController = new UsuarioController(usuarioService);
+        usuarioRepository = mock(UsuarioRepository.class);
+        passwordEncoder = mock(PasswordEncoder.class);
+        usuarioController = new UsuarioController(usuarioService, usuarioRepository, passwordEncoder);
     }
 
     @Test

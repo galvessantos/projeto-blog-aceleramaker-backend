@@ -11,9 +11,16 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UsuarioService {
@@ -55,10 +62,13 @@ public class UsuarioService {
         }
 
         usuario.setNome(dto.nome());
-        usuario.setUsername(dto.username());
 
         if (dto.senha() != null && !dto.senha().isBlank()) {
             usuario.setSenha(passwordEncoder.encode(dto.senha()));
+        }
+
+        if (dto.foto() != null) {
+            usuario.setFoto(dto.foto());
         }
 
         usuarioRepository.save(usuario);
@@ -85,5 +95,29 @@ public class UsuarioService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return authentication.getAuthorities().stream()
                 .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
+    }
+
+    public String salvarFoto(MultipartFile foto) {
+        try {
+
+            String originalFilename = foto.getOriginalFilename();
+            String extensao = originalFilename != null ? originalFilename.substring(originalFilename.lastIndexOf(".")) : ".jpg";
+            String nomeArquivo = UUID.randomUUID() + extensao;
+
+            String caminhoUpload = "uploads/fotos/";
+            Path diretorioDestino = Paths.get(caminhoUpload);
+
+            if (!Files.exists(diretorioDestino)) {
+                Files.createDirectories(diretorioDestino);
+            }
+
+            Path caminhoArquivo = diretorioDestino.resolve(nomeArquivo);
+
+            Files.copy(foto.getInputStream(), caminhoArquivo, StandardCopyOption.REPLACE_EXISTING);
+
+            return caminhoUpload + nomeArquivo;
+        } catch (IOException e) {
+            throw new RuntimeException("Erro ao salvar arquivo: " + e.getMessage());
+        }
     }
 }

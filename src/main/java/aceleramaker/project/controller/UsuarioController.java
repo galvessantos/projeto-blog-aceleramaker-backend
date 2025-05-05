@@ -1,36 +1,47 @@
 package aceleramaker.project.controller;
 
+import aceleramaker.project.dto.AlterarSenhaRequestDto;
 import aceleramaker.project.dto.UpdateUsuarioDto;
 import aceleramaker.project.dto.UsuarioRespostaDto;
 import aceleramaker.project.entity.Usuario;
 import aceleramaker.project.exceptions.AccessDeniedCustomException;
 import aceleramaker.project.exceptions.ResourceNotFoundException;
+import aceleramaker.project.repository.UsuarioRepository;
 import aceleramaker.project.service.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/v1/usuarios")
 @Tag(name = "02 - Usuários", description = "Operações relacionadas à conta do usuário")
+@CrossOrigin(origins = "http://localhost:4200")
 public class UsuarioController {
 
     private static final String USUARIO_NAO_ENCONTRADO = "Usuário não encontrado com ID: ";
 
     private final UsuarioService usuarioService;
+    private final UsuarioRepository usuarioRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UsuarioController(UsuarioService usuarioService) {
+    public UsuarioController(UsuarioService usuarioService, UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
         this.usuarioService = usuarioService;
+        this.usuarioRepository = usuarioRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @GetMapping("/{usuarioId}")
@@ -46,6 +57,8 @@ public class UsuarioController {
 
         UsuarioRespostaDto resposta = new UsuarioRespostaDto(
                 usuario.getNome(),
+                usuario.getUsername(),
+                usuario.getEmail(),
                 usuario.getFoto(),
                 usuario.getCreationTimestamp()
         );
@@ -67,6 +80,8 @@ public class UsuarioController {
         List<UsuarioRespostaDto> resposta = usuarios.stream()
                 .map(usuario -> new UsuarioRespostaDto(
                         usuario.getNome(),
+                        usuario.getUsername(),
+                        usuario.getEmail(),
                         usuario.getFoto(),
                         usuario.getCreationTimestamp()
                 ))
@@ -75,27 +90,76 @@ public class UsuarioController {
         return ResponseEntity.ok(resposta);
     }
 
-    @PutMapping("/{usuarioId}")
-    @Operation(summary = "Atualizar dados de um usuário (autorizado apenas para o próprio usuário)",
+    @PutMapping("/perfil")
+    @Operation(summary = "Atualizar perfil do usuário logado com foto",
             responses = {
-                    @ApiResponse(responseCode = "204", description = "Usuário atualizado com sucesso."),
-                    @ApiResponse(responseCode = "403", description = "Acesso negado."),
-                    @ApiResponse(responseCode = "404", description = "Usuário não encontrado.")
+                    @ApiResponse(responseCode = "200", description = "Perfil atualizado com sucesso."),
+                    @ApiResponse(responseCode = "400", description = "Requisição inválida."),
+                    @ApiResponse(responseCode = "401", description = "Não autenticado.")
             }
     )
-    public ResponseEntity<Void> updateUsuarioById(
-            @Parameter(description = "ID do usuário") @PathVariable Long usuarioId,
-            @RequestBody @Valid UpdateUsuarioDto updateUsuarioDto,
-            @Parameter(hidden = true) @AuthenticationPrincipal UserDetails current) {
+    public ResponseEntity<UsuarioRespostaDto> atualizarPerfil(
+            @RequestPart("nome") String nome,
+            @RequestPart(value = "foto", required = false) MultipartFile foto,
+            @Parameter(hidden = true) @AuthenticationPrincipal UserDetails userDetails) {
 
-        Usuario alvo = usuarioService.getUsuarioById(usuarioId)
-                .orElseThrow(() -> new ResourceNotFoundException(USUARIO_NAO_ENCONTRADO + usuarioId));
+        Usuario usuario = usuarioRepository.findByUsernameOrEmail(userDetails.getUsername(), userDetails.getUsername())
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
 
-        if (!current.getUsername().equals(alvo.getUsername())) {
-            throw new AccessDeniedCustomException("Você só pode atualizar sua própria conta.");
+        String fotoUrl = null;
+        if (foto != null && !foto.isEmpty()) {
+            fotoUrl = usuarioService.salvarFoto(foto);
         }
 
-        usuarioService.updateUsuarioById(usuarioId, updateUsuarioDto);
+        UpdateUsuarioDto updateDto = new UpdateUsuarioDto(
+                nome,
+                null,
+                fotoUrl != null ? fotoUrl : usuario.getFoto()
+        );
+
+        usuarioService.updateUsuarioById(usuario.getId(), updateDto);
+
+
+        Usuario usuarioAtualizado = usuarioService.getUsuarioById(usuario.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
+
+        UsuarioRespostaDto resposta = new UsuarioRespostaDto(
+                usuarioAtualizado.getNome(),
+                usuarioAtualizado.getUsername(),
+                usuarioAtualizado.getEmail(),
+                usuarioAtualizado.getFoto(),
+                usuarioAtualizado.getCreationTimestamp()
+        );
+
+        return ResponseEntity.ok(resposta);
+    }
+
+    @PostMapping("/alterar-senha")
+    @Operation(summary = "Alterar senha do usuário logado",
+            responses = {
+                    @ApiResponse(responseCode = "204", description = "Senha alterada com sucesso."),
+                    @ApiResponse(responseCode = "400", description = "Senha atual inválida."),
+                    @ApiResponse(responseCode = "401", description = "Não autenticado.")
+            }
+    )
+    public ResponseEntity<Void> alterarSenha(
+            @RequestBody @Valid AlterarSenhaRequestDto request,
+            @Parameter(hidden = true) @AuthenticationPrincipal UserDetails userDetails) {
+
+        Usuario usuario = usuarioRepository.findByUsernameOrEmail(userDetails.getUsername(), userDetails.getUsername())
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
+
+        if (!passwordEncoder.matches(request.senhaAtual(), usuario.getPassword())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Senha atual inválida");
+        }
+
+        UpdateUsuarioDto updateDto = new UpdateUsuarioDto(
+                usuario.getNome(),
+                request.novaSenha(),
+                usuario.getFoto()
+        );
+
+        usuarioService.updateUsuarioById(usuario.getId(), updateDto);
         return ResponseEntity.noContent().build();
     }
 

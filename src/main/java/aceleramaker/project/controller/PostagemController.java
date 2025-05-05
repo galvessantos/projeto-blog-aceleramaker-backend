@@ -21,6 +21,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/postagens")
 @Tag(name = "03 - Postagens", description = "Operações relacionadas às postagens")
+@CrossOrigin(origins = "http://localhost:4200")
 public class PostagemController {
 
     private final PostagemService postagemService;
