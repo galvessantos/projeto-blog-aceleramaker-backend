@@ -82,7 +82,7 @@ class UsuarioServiceTest {
 
     @Test
     void deveAtualizarUsuarioComSucesso() {
-        UpdateUsuarioDto dto = new UpdateUsuarioDto("novoNome", "novoUsername", "novaSenha", null);
+        UpdateUsuarioDto dto = new UpdateUsuarioDto("novoNome", "novaSenha", "novaFoto");
 
         when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
         when(passwordEncoder.encode("novaSenha")).thenReturn("senhaNovaCriptografada");
@@ -90,7 +90,6 @@ class UsuarioServiceTest {
         usuarioService.updateUsuarioById(1L, dto);
 
         assertEquals("novoNome", usuario.getNome());
-        assertEquals("novoUsername", usuario.getUsername());
         assertEquals("senhaNovaCriptografada", usuario.getPassword());
 
         verify(usuarioRepository, times(1)).save(usuario);
@@ -100,7 +99,7 @@ class UsuarioServiceTest {
     void deveLancarExcecao_AtualizarUsuarioNaoExistente() {
         when(usuarioRepository.findById(99L)).thenReturn(Optional.empty());
 
-        UpdateUsuarioDto dto = new UpdateUsuarioDto("nome", "username", "senha", null);
+        UpdateUsuarioDto dto = new UpdateUsuarioDto("nome", "senha", "foto");
 
         assertThrows(ResourceNotFoundException.class, () -> {
             usuarioService.updateUsuarioById(99L, dto);
@@ -112,7 +111,7 @@ class UsuarioServiceTest {
         usuario.setUsername("outroUsuario");
 
         when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
-        UpdateUsuarioDto dto = new UpdateUsuarioDto("nome", "username", "senha", null);
+        UpdateUsuarioDto dto = new UpdateUsuarioDto("nome", "senha", "foto");
 
         assertThrows(AccessDeniedException.class, () -> {
             usuarioService.updateUsuarioById(1L, dto);
