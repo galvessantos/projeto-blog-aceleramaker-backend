@@ -87,7 +87,8 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList(
                 "http://localhost:4200",
-                "https://projeto-blog-aceleramaker-frontend1.vercel.app"
+                "https://projeto-blog-aceleramaker-frontend1.vercel.app",
+                "https://projeto-blog-aceleramaker-frontend1.vercel.app/"
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
