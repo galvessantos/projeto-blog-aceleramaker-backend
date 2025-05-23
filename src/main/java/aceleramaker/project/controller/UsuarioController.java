@@ -185,4 +185,36 @@ public class UsuarioController {
         usuarioService.deleteById(usuarioId);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/me")
+    @Operation(summary = "Buscar dados do usuário logado",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Usuário encontrado com sucesso."),
+                    @ApiResponse(responseCode = "401", description = "Não autenticado.")
+            }
+    )
+    public ResponseEntity<UsuarioRespostaDto> getUsuarioLogado(
+            @Parameter(hidden = true) @AuthenticationPrincipal UserDetails userDetails) {
+
+        Usuario usuario = usuarioRepository.findByUsernameOrEmail(userDetails.getUsername(), userDetails.getUsername())
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
+
+        UsuarioRespostaDto resposta = new UsuarioRespostaDto(
+                usuario.getNome(),
+                usuario.getUsername(),
+                usuario.getEmail(),
+                usuario.getFoto(),
+                usuario.getCreationTimestamp()
+        );
+
+        Map<String, Object> respostaCompleta = new HashMap<>();
+        respostaCompleta.put("id", usuario.getId());
+        respostaCompleta.put("nome", usuario.getNome());
+        respostaCompleta.put("username", usuario.getUsername());
+        respostaCompleta.put("email", usuario.getEmail());
+        respostaCompleta.put("foto", usuario.getFoto());
+        respostaCompleta.put("creationTimestamp", usuario.getCreationTimestamp());
+
+        return ResponseEntity.ok(respostaCompleta);
+    }
 }
