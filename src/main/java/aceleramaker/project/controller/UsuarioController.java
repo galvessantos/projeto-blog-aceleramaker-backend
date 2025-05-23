@@ -195,7 +195,7 @@ public class UsuarioController {
                     @ApiResponse(responseCode = "401", description = "Não autenticado.")
             }
     )
-    public ResponseEntity<UsuarioRespostaDto> getUsuarioLogado(
+    public ResponseEntity<Map<String, Object>> getUsuarioLogado(
             @Parameter(hidden = true) @AuthenticationPrincipal UserDetails userDetails) {
 
         Usuario usuario = usuarioRepository.findByUsernameOrEmail(userDetails.getUsername(), userDetails.getUsername())
