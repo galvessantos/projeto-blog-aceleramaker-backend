@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import aceleramaker.project.entity.Usuario;
 
 import java.util.Map;
 
@@ -41,7 +42,7 @@ class AuthControllerTest {
 
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(auth);
         when(jwtTokenProvider.generateToken(auth)).thenReturn("token123");
-        
+
         when(auth.getPrincipal()).thenReturn(usuario);
         when(usuario.getId()).thenReturn(1L);
         when(usuario.getNome()).thenReturn("Gabriel");
