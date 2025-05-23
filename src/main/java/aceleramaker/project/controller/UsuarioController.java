@@ -58,6 +58,7 @@ public class UsuarioController {
                 .orElseThrow(() -> new ResourceNotFoundException(USUARIO_NAO_ENCONTRADO + usuarioId));
 
         UsuarioRespostaDto resposta = new UsuarioRespostaDto(
+                usuario.getId(),
                 usuario.getNome(),
                 usuario.getUsername(),
                 usuario.getEmail(),
@@ -81,6 +82,7 @@ public class UsuarioController {
 
         List<UsuarioRespostaDto> resposta = usuarios.stream()
                 .map(usuario -> new UsuarioRespostaDto(
+                        usuario.getId(),
                         usuario.getNome(),
                         usuario.getUsername(),
                         usuario.getEmail(),
@@ -126,6 +128,7 @@ public class UsuarioController {
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
 
         UsuarioRespostaDto resposta = new UsuarioRespostaDto(
+                usuarioAtualizado.getId(),
                 usuarioAtualizado.getNome(),
                 usuarioAtualizado.getUsername(),
                 usuarioAtualizado.getEmail(),
@@ -202,6 +205,7 @@ public class UsuarioController {
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
 
         UsuarioRespostaDto resposta = new UsuarioRespostaDto(
+                usuario.getId(),
                 usuario.getNome(),
                 usuario.getUsername(),
                 usuario.getEmail(),

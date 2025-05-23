@@ -1,6 +1,7 @@
 package aceleramaker.project.dto;
 
 public record UsuarioRespostaDto(
+        Long id,
         String nome,
         String username,
         String email,

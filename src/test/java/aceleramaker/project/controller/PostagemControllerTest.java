@@ -69,7 +69,7 @@ class PostagemControllerTest {
                 postagem.getTitulo(),
                 postagem.getTexto(),
                 new TemaRespostaDto(tema.getId(), tema.getDescricao()),
-                new UsuarioRespostaDto(usuario.getNome(), usuario.getUsername(), usuario.getEmail(), usuario.getFoto(), usuario.getCreationTimestamp()),
+                new UsuarioRespostaDto(usuario.getId(), usuario.getNome(), usuario.getUsername(), usuario.getEmail(), usuario.getFoto(), usuario.getCreationTimestamp()),
                 postagem.getCreationTimestamp(),
                 postagem.getUpdateTimestamp()
         );
@@ -99,7 +99,7 @@ class PostagemControllerTest {
                 "Título",
                 "Texto",
                 new TemaRespostaDto(1L, "Tecnologia"),
-                new UsuarioRespostaDto("Fulano", "username", "email@example.com", null, Instant.now()),
+                new UsuarioRespostaDto(1L, "Fulano", "username", "email@example.com", null, Instant.now()),
                 LocalDateTime.now(),
                 LocalDateTime.now()
         );
@@ -123,7 +123,7 @@ class PostagemControllerTest {
                 "Título",
                 "Texto",
                 new TemaRespostaDto(1L, "Tecnologia"),
-                new UsuarioRespostaDto("Fulano", "username", "email@example.com", null, Instant.now()),
+                new UsuarioRespostaDto(1L, "Fulano", "username", "email@example.com", null, Instant.now()),
                 LocalDateTime.now(),
                 LocalDateTime.now()
         );
@@ -168,7 +168,7 @@ class PostagemControllerTest {
                 postagem.getTitulo(),
                 postagem.getTexto(),
                 new TemaRespostaDto(tema.getId(), tema.getDescricao()),
-                new UsuarioRespostaDto(usuario.getNome(), usuario.getUsername(), usuario.getEmail(), usuario.getFoto(), usuario.getCreationTimestamp()),
+                new UsuarioRespostaDto(usuario.getId(), usuario.getNome(), usuario.getUsername(), usuario.getEmail(), usuario.getFoto(), usuario.getCreationTimestamp()),
                 postagem.getCreationTimestamp(),
                 postagem.getUpdateTimestamp()
         );
@@ -207,13 +207,13 @@ class PostagemControllerTest {
         );
 
         PostagemRespostaDto respostaDto = new PostagemRespostaDto(
-                postagemAtualizada.getId(),
-                postagemAtualizada.getTitulo(),
-                postagemAtualizada.getTexto(),
+                postagem.getId(),
+                postagem.getTitulo(),
+                postagem.getTexto(),
                 new TemaRespostaDto(tema.getId(), tema.getDescricao()),
-                new UsuarioRespostaDto(usuario.getNome(), usuario.getUsername(), usuario.getEmail(), usuario.getFoto(), usuario.getCreationTimestamp()),
-                postagemAtualizada.getCreationTimestamp(),
-                postagemAtualizada.getUpdateTimestamp()
+                new UsuarioRespostaDto(usuario.getId(), usuario.getNome(), usuario.getUsername(), usuario.getEmail(), usuario.getFoto(), usuario.getCreationTimestamp()),
+                postagem.getCreationTimestamp(),
+                postagem.getUpdateTimestamp()
         );
 
         when(postagemService.atualizarDto(1L, dto)).thenReturn(Optional.of(respostaDto));
@@ -244,7 +244,7 @@ class PostagemControllerTest {
                 "Título",
                 "Texto",
                 new TemaRespostaDto(1L, "Tecnologia"),
-                new UsuarioRespostaDto("Fulano", "username", "email@example.com", null, Instant.now()),
+                new UsuarioRespostaDto(1L, "Fulano", "username", "email@example.com", null, Instant.now()),
                 LocalDateTime.now(),
                 LocalDateTime.now()
         );
@@ -265,7 +265,7 @@ class PostagemControllerTest {
                 "Título",
                 "Texto",
                 new TemaRespostaDto(1L, "Tecnologia"),
-                new UsuarioRespostaDto("Fulano", "username", "email@example.com", null, Instant.now()),
+                new UsuarioRespostaDto(1L, "Fulano", "username", "email@example.com", null, Instant.now()),
                 LocalDateTime.now(),
                 LocalDateTime.now()
         );

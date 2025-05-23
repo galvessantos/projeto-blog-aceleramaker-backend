@@ -108,6 +108,7 @@ public class PostagemService {
                 postagem.getTexto(),
                 new TemaRespostaDto(postagem.getTema().getId(), postagem.getTema().getDescricao()),
                 new UsuarioRespostaDto(
+                        postagem.getUsuario().getId(),
                         postagem.getUsuario().getNome(),
                         postagem.getUsuario().getUsername(),
                         postagem.getUsuario().getEmail(),
