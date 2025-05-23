@@ -207,13 +207,13 @@ class PostagemControllerTest {
         );
 
         PostagemRespostaDto respostaDto = new PostagemRespostaDto(
-                postagem.getId(),
-                postagem.getTitulo(),
-                postagem.getTexto(),
+                postagemAtualizada.getId(),
+                postagemAtualizada.getTitulo(),
+                postagemAtualizada.getTexto(),
                 new TemaRespostaDto(tema.getId(), tema.getDescricao()),
                 new UsuarioRespostaDto(usuario.getId(), usuario.getNome(), usuario.getUsername(), usuario.getEmail(), usuario.getFoto(), usuario.getCreationTimestamp()),
-                postagem.getCreationTimestamp(),
-                postagem.getUpdateTimestamp()
+                postagemAtualizada.getCreationTimestamp(),
+                postagemAtualizada.getUpdateTimestamp()
         );
 
         when(postagemService.atualizarDto(1L, dto)).thenReturn(Optional.of(respostaDto));
