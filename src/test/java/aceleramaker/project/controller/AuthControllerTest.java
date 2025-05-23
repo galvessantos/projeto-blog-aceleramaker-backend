@@ -37,14 +37,34 @@ class AuthControllerTest {
     void testLoginSuccess() {
         LoginDto loginDto = new LoginDto("usuario", "senha123");
         Authentication auth = mock(Authentication.class);
+        Usuario usuario = mock(Usuario.class);
 
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(auth);
         when(jwtTokenProvider.generateToken(auth)).thenReturn("token123");
+        
+        when(auth.getPrincipal()).thenReturn(usuario);
+        when(usuario.getId()).thenReturn(1L);
+        when(usuario.getNome()).thenReturn("Gabriel");
+        when(usuario.getUsername()).thenReturn("usuario");
+        when(usuario.getEmail()).thenReturn("usuario@email.com");
+        when(usuario.getFoto()).thenReturn("foto.png");
 
-        ResponseEntity<LoginRespostaDto> response = authController.login(loginDto);
+        ResponseEntity<Map<String, Object>> response = authController.login(loginDto);
 
-        assertEquals("token123", response.getBody().token());
         assertEquals(200, response.getStatusCode().value());
+        Map<String, Object> body = response.getBody();
+
+        assertNotNull(body);
+        assertEquals("token123", body.get("token"));
+        assertEquals("Bearer", body.get("tipo"));
+
+        Map<String, Object> usuarioData = (Map<String, Object>) body.get("usuario");
+        assertNotNull(usuarioData);
+        assertEquals(1L, usuarioData.get("id"));
+        assertEquals("Gabriel", usuarioData.get("nome"));
+        assertEquals("usuario", usuarioData.get("username"));
+        assertEquals("usuario@email.com", usuarioData.get("email"));
+        assertEquals("foto.png", usuarioData.get("foto"));
     }
 
     @Test

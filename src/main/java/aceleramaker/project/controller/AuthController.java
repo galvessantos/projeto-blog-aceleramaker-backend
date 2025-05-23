@@ -51,7 +51,7 @@ public class AuthController {
             );
 
             String token = tokenProvider.generateToken(authentication);
-            
+
             Usuario usuario = (Usuario) authentication.getPrincipal();
 
             Map<String, Object> response = new HashMap<>();
